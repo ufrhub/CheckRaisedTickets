@@ -20,9 +20,11 @@ export default function Home() {
 
         const isToday = isSameDay(date, new Date());
         const isTicketDate = highlightDates.some(d => isSameDay(d, date));
+        const isFuture = date > new Date();
 
         if (isTicketDate) return 'highlight';
         if (isToday) return 'today-border';
+        if (isFuture) return 'future-date';
 
         return null;
     };
