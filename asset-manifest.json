@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/CheckRaisedTickets/static/css/main.a89863df.css",
+    "main.js": "/CheckRaisedTickets/static/js/main.57839eb1.js",
+    "index.html": "/CheckRaisedTickets/index.html",
+    "main.a89863df.css.map": "/CheckRaisedTickets/static/css/main.a89863df.css.map",
+    "main.57839eb1.js.map": "/CheckRaisedTickets/static/js/main.57839eb1.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a89863df.css",
+    "static/js/main.57839eb1.js"
+  ]
+}
