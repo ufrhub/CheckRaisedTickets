@@ -2,16 +2,8 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import ticketData from "../tickets.json";
+import GroupedTicketList from "../Components/GroupedTicketList";
 import "../Styles/TicketsRaised.css";
-
-const TICKETS_PER_PAGE = 20;
-
-const formatTime = (index) => {
-  const hours = Math.floor(index / 2) + 7;
-  const minutes = index % 2 === 0 ? "00" : "30";
-  const timeString = `${hours % 12 === 0 ? 12 : hours % 12}:${minutes} ${hours >= 12 ? "PM" : "AM"}`;
-  return timeString;
-};
 
 const formatDisplayDate = (isoDateStr) => {
   const [year, month, day] = isoDateStr.split("-");
@@ -26,7 +18,6 @@ const formatDisplayDate = (isoDateStr) => {
 const TicketsRaised = () => {
   const { date } = useParams();
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedTitle, setSelectedTitle] = useState({ value: "All", label: "All" });
   const navigate = useNavigate();
 
@@ -61,20 +52,6 @@ const TicketsRaised = () => {
       ? filteredTickets
       : filteredTickets.filter((ticket) => ticket.title === selectedTitle.value);
 
-  const totalPages = Math.ceil(titleFilteredTickets.length / TICKETS_PER_PAGE);
-  const paginatedTickets = titleFilteredTickets.slice(
-    (currentPage - 1) * TICKETS_PER_PAGE,
-    currentPage * TICKETS_PER_PAGE
-  );
-
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
-
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
-
   return (
     <div className="tickets-container">
       <div className="dropdown-wrapper">
@@ -87,7 +64,6 @@ const TicketsRaised = () => {
           value={selectedTitle}
           onChange={(selected) => {
             setSelectedTitle(selected);
-            setCurrentPage(1);
           }}
         />
       </div>
@@ -102,43 +78,10 @@ const TicketsRaised = () => {
       {filteredTickets.length === 0 ? (
         <p className="no-tickets">No tickets found for this date.</p>
       ) : (
-        <>
-          <div className="ticket-list">
-            {paginatedTickets.map((ticket, index) => (
-              <div
-                key={index}
-                className="ticket-item"
-                onClick={() => setSelectedTicket(ticket)}
-              >
-                <div className="ticket-time">
-                  {formatTime(index + (currentPage - 1) * TICKETS_PER_PAGE)}
-                </div>
-                <div className="ticket-details">
-                  <div className="ticket-unit">Unit {ticket.eNo.slice(-3)}</div>
-                  <div className="ticket-name">({ticket.name || "Anonymous"})</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {
-            totalPages > 1
-              ?
-              <div className="pagination-controls">
-                <button onClick={handlePrev} disabled={currentPage === 1}>
-                  Previous
-                </button>
-                <span>
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button onClick={handleNext} disabled={currentPage === totalPages}>
-                  Next
-                </button>
-              </div>
-              :
-              null
-          }
-        </>
+        <GroupedTicketList
+          tickets={titleFilteredTickets}
+          onSelect={(ticket) => setSelectedTicket(ticket)}
+        />
       )}
 
       {selectedTicket && (
