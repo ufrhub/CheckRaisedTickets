@@ -106,7 +106,7 @@ const TicketsRaised = () => {
           <div className="ticket-list">
             {paginatedTickets.map((ticket, index) => (
               <div
-                key={ticket.eNo}
+                key={index}
                 className="ticket-item"
                 onClick={() => setSelectedTicket(ticket)}
               >
@@ -121,19 +121,23 @@ const TicketsRaised = () => {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="pagination-controls">
-              <button onClick={handlePrev} disabled={currentPage === 1}>
-                Previous
-              </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button onClick={handleNext} disabled={currentPage === totalPages}>
-                Next
-              </button>
-            </div>
-          )}
+          {
+            totalPages > 1
+              ?
+              <div className="pagination-controls">
+                <button onClick={handlePrev} disabled={currentPage === 1}>
+                  Previous
+                </button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button onClick={handleNext} disabled={currentPage === totalPages}>
+                  Next
+                </button>
+              </div>
+              :
+              null
+          }
         </>
       )}
 
