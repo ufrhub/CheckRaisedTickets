@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import "../Styles/TicketsRaised.css";
 
 const parseTimeToSlotKey = (timeStr) => {
@@ -22,6 +22,8 @@ const parseTimeToSlotKey = (timeStr) => {
 
 const GroupedTicketList = ({ tickets, onSelect }) => {
     const [expandedGroups, setExpandedGroups] = useState({});
+    const [maxHeights, setMaxHeights] = useState({});
+    const contentRefs = useRef({});
 
     const groupedTickets = {};
     tickets.forEach((ticket) => {
@@ -29,6 +31,17 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
         if (!groupedTickets[slotKey]) groupedTickets[slotKey] = [];
         groupedTickets[slotKey].push(ticket);
     });
+
+    useEffect(() => {
+        const newHeights = {};
+        Object.keys(groupedTickets).forEach((slotKey) => {
+            const contentEl = contentRefs.current[slotKey];
+            if (contentEl) {
+                newHeights[slotKey] = contentEl.scrollHeight;
+            }
+        });
+        setMaxHeights(newHeights);
+    }, [tickets]);
 
     const toggleGroup = (slotKey) => {
         setExpandedGroups((prev) => ({
@@ -49,6 +62,9 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
                             <div
                                 className="ticket-main"
                                 style={{ display: "flex", flex: 1, cursor: "pointer" }}
+                                onClick={(e) => {
+                                    toggleGroup(slotKey);
+                                }}
                             >
                                 <div className="ticket-time-slot">{slotKey}</div>
                                 <div className="ticket-details">
@@ -76,24 +92,33 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
                         </div>
 
                         {/* Expanded tickets */}
-                        {
-                            isExpanded &&
-                            groupTickets.map((ticket, i) => (
-                                <div
-                                    key={i}
-                                    className="dropdown-ticket-item"
-                                    onClick={() => onSelect(ticket)}
-                                >
-                                    <div className="dropdown-ticket-details">
-                                        <div className="dropdown-ticket-unit">Unit {ticket.eNo.slice(-3)}</div>
-                                        <div className="dropdown-ticket-name">({ticket.name || "Anonymous"})</div>
+                        <div
+                            className="dropdown-ticket-container"
+                            ref={(el) => (contentRefs.current[slotKey] = el)}
+                            style={{
+                                maxHeight: isExpanded ? `${maxHeights[slotKey] || 0}px` : "0px",
+                                opacity: isExpanded ? 1 : 0,
+                                overflow: "hidden",
+                                transition: "max-height 0.3s ease, opacity 0.3s ease",
+                            }}
+                        >
+                            {
+                                groupTickets.map((ticket, i) => (
+                                    <div
+                                        key={i}
+                                        className="dropdown-ticket-item"
+                                        onClick={() => onSelect(ticket)}
+                                    >
+                                        <div className="dropdown-ticket-details">
+                                            <div className="dropdown-ticket-unit">Unit {ticket.eNo.slice(-3)}</div>
+                                            <div className="dropdown-ticket-name">({ticket.name || "Anonymous"})</div>
+                                        </div>
+                                        <div className="dropdown-ticket-reason">{ticket.service}</div>
                                     </div>
-                                    <div className="dropdown-ticket-reason">{ticket.service}</div>
-                                </div>
-                            ))
-                        }
+                                ))
+                            }
+                        </div>
                     </div>
-
                 );
             })}
         </div>
