@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import "../Styles/TicketsRaised.css";
 
 const parseTimeToSlotKey = (timeStr) => {
@@ -25,13 +25,17 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
     const [maxHeights, setMaxHeights] = useState({});
     const contentRefs = useRef({});
 
-    const groupedTickets = {};
-    tickets.forEach((ticket) => {
-        const slotKey = parseTimeToSlotKey(ticket.time);
-        if (!groupedTickets[slotKey]) groupedTickets[slotKey] = [];
-        groupedTickets[slotKey].push(ticket);
-    });
+    const groupedTickets = useMemo(() => {
+        const result = {};
+        tickets.forEach((ticket) => {
+            const slotKey = parseTimeToSlotKey(ticket.time);
+            if (!result[slotKey]) result[slotKey] = [];
+            result[slotKey].push(ticket);
+        });
+        return result;
+    }, [tickets]);
 
+    // ✅ Now it's safe to add groupedTickets as a dependency
     useEffect(() => {
         const newHeights = {};
         Object.keys(groupedTickets).forEach((slotKey) => {
@@ -41,7 +45,7 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
             }
         });
         setMaxHeights(newHeights);
-    }, [tickets]);
+    }, [groupedTickets]);
 
     const toggleGroup = (slotKey) => {
         setExpandedGroups((prev) => ({
