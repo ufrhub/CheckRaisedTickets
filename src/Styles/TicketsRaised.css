@@ -109,7 +109,7 @@
 }
 
 .dropdown-icon {
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease-in-out;
 }
 
 .dropdown-ticket-item {
@@ -118,6 +118,7 @@
   align-items: center;
   justify-content: space-between;
   background-color: #f1f1f1;
+  border: 1px solid gray;
   padding: 0.8rem 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -129,7 +130,7 @@
 }
 
 .dropdown-ticket-details {
-  flex-grow: 1;
+  width: fit-content;
   text-align: left;
 }
 
@@ -145,7 +146,7 @@
 }
 
 .dropdown-ticket-reason {
-  width: fit-content;
+  width: 100px;
 }
 
 .ticket-modal {
@@ -244,8 +245,7 @@
   }
 
   .ticket-time-slot,
-  .ticket-details,
-  .dropdown-ticket-details {
+  .ticket-details {
     width: 100%;
   }
 
