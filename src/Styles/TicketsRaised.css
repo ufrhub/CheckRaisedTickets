@@ -24,6 +24,8 @@
 }
 
 .back-icon-button {
+  height: 20px;
+  width: 20px;
   border: 1px solid #ccc;
   background-color: white;
   color: #007bff;
@@ -50,34 +52,45 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background-color: #f1f1f1;
+  background-color: #a7a7a7;
   padding: 0.8rem 1rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease-in-out;
 }
 
 .ticket-item:hover {
-  background-color: #e2e2e2;
+  background-color: #a6a6a6;
 }
 
-.ticket-time {
+.ticket-time-slot {
   font-weight: bold;
   width: 100px;
+  display: flex;
+  align-items: center;
 }
 
 .ticket-details {
   flex-grow: 1;
-  text-align: right;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
 }
 
-.ticket-unit {
-  font-size: 1rem;
-}
-
-.ticket-name {
-  font-size: 0.85rem;
-  color: #666;
+.ticket-length {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 12px;
+  border: 1px solid #ccc;
+  color: #fff;
+  border-radius: 4px;
+  background-color: #1500ff40;
+  font-size: 14px;
+  user-select: none;
+  flex-shrink: 0;
 }
 
 .dropdown-icon-box {
@@ -97,6 +110,42 @@
 
 .dropdown-icon {
   transition: transform 0.2s ease;
+}
+
+.dropdown-ticket-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f1f1f1;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.dropdown-ticket-item:hover {
+  background-color: #e2e2e2;
+}
+
+.dropdown-ticket-details {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.dropdown-ticket-unit {
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.dropdown-ticket-name {
+  font-size: 0.85rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.dropdown-ticket-reason {
+  width: fit-content;
 }
 
 .ticket-modal {
@@ -194,8 +243,9 @@
     margin-bottom: 0;
   }
 
-  .ticket-time,
-  .ticket-details {
+  .ticket-time-slot,
+  .ticket-details,
+  .dropdown-ticket-details {
     width: 100%;
   }
 

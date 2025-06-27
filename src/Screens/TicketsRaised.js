@@ -69,9 +69,12 @@ const TicketsRaised = () => {
       </div>
 
       <div className="tickets-header">
-        <button className="back-icon-button" onClick={() => navigate("/")}>
-          &#8592;
-        </button>
+        <img
+          className="back-icon-button"
+          src={require("../Assets/left-arrow.svg").default}
+          alt="Go-Back"
+          onClick={() => navigate("/")}
+        />
         <h2>{formatDisplayDate(date)}</h2>
       </div>
 

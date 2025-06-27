@@ -41,21 +41,18 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
         <div className="ticket-list">
             {Object.entries(groupedTickets).map(([slotKey, groupTickets]) => {
                 const isExpanded = expandedGroups[slotKey];
-                const firstTicket = groupTickets[0];
 
                 return (
                     <div key={slotKey} className="ticket-group">
-                        <div className="ticket-item group-header">
+                        <div className="ticket-item">
                             {/* Main clickable area for modal */}
                             <div
                                 className="ticket-main"
-                                onClick={() => onSelect(firstTicket)}
                                 style={{ display: "flex", flex: 1, cursor: "pointer" }}
                             >
-                                <div className="ticket-time">{slotKey}</div>
+                                <div className="ticket-time-slot">{slotKey}</div>
                                 <div className="ticket-details">
-                                    <div className="ticket-unit">Unit {firstTicket.eNo.slice(-3)}</div>
-                                    <div className="ticket-name">({firstTicket.name || "Anonymous"})</div>
+                                    <div className="ticket-length">{groupTickets.length}</div>
                                 </div>
                             </div>
 
@@ -64,9 +61,8 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
                                 className="dropdown-icon-box"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    if (groupTickets.length > 1) toggleGroup(slotKey);
+                                    toggleGroup(slotKey);
                                 }}
-                                style={{ opacity: groupTickets.length > 1 ? 1 : 0.3 }}
                             >
                                 <div
                                     className="dropdown-icon"
@@ -80,20 +76,22 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
                         </div>
 
                         {/* Expanded tickets */}
-                        {isExpanded &&
-                            groupTickets.slice(1).map((ticket, i) => (
+                        {
+                            isExpanded &&
+                            groupTickets.map((ticket, i) => (
                                 <div
                                     key={i}
-                                    className="ticket-item sub-ticket"
+                                    className="dropdown-ticket-item"
                                     onClick={() => onSelect(ticket)}
                                 >
-                                    <div className="ticket-time">{ticket.time}</div>
-                                    <div className="ticket-details">
-                                        <div className="ticket-unit">Unit {ticket.eNo.slice(-3)}</div>
-                                        <div className="ticket-name">({ticket.name || "Anonymous"})</div>
+                                    <div className="dropdown-ticket-details">
+                                        <div className="dropdown-ticket-unit">Unit {ticket.eNo.slice(-3)}</div>
+                                        <div className="dropdown-ticket-name">({ticket.name || "Anonymous"})</div>
                                     </div>
+                                    <div className="dropdown-ticket-reason">{ticket.service}</div>
                                 </div>
-                            ))}
+                            ))
+                        }
                     </div>
 
                 );
