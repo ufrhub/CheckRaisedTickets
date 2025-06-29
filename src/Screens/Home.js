@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../Styles/Home.css';
@@ -10,19 +10,50 @@ export default function Home() {
     const navigate = useNavigate();
     const [highlightDates, setHighlightDates] = useState([]);
     const [token, setToken] = useState(null);
+    const tokenSet = useRef(false);
+
+    useEffect(() => {
+        const ticketDates = tickets.map(ticket => new Date(ticket.date));
+        setHighlightDates(ticketDates);
+    }, []);
 
     useEffect(() => {
         const ticketDates = tickets.map(ticket => new Date(ticket.date));
         setHighlightDates(ticketDates);
 
-        // Expose window.setToken
-        window.setToken = (receivedToken) => {
-            console.log("Received token from native:", receivedToken);
-            setToken(receivedToken); // update token state
+        // Utility: only sets token if it hasn't been set yet
+        const setTokenOnce = (newToken, source) => {
+            if (!tokenSet.current && newToken) {
+                tokenSet.current = true;
+                setToken(newToken);
+                console.log(`✅ Token set from ${source}:`, newToken);
+            } else {
+                console.log(`⛔ Ignored token from ${source} because token is already set`);
+            }
         };
 
-        // Optional: cleanup
+        // 1. Try to get token from URL
+        const queryParams = new URLSearchParams(window.location.search);
+        const tokenFromUrl = queryParams.get('token');
+        setTokenOnce(tokenFromUrl, "URL");
+
+        // 2. Listen to messages from postMessage
+        const handleMessage = (event) => {
+            const message = event.data;
+            if (message && typeof message === "object" && "data" in message) {
+                setTokenOnce(message.data, "postMessage");
+            }
+        };
+        window.addEventListener("message", handleMessage);
+
+        // 3. Expose window.setToken for native WebView
+        window.setToken = (receivedToken) => {
+            setTokenOnce(receivedToken, "window.setToken");
+        };
+
+        // Cleanup
         return () => {
+            window.removeEventListener("message", handleMessage);
             delete window.setToken;
         };
     }, []);
