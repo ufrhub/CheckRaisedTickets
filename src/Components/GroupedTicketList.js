@@ -60,15 +60,20 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
                 const isExpanded = expandedGroups[slotKey];
 
                 return (
-                    <div key={slotKey} className="ticket-group">
-                        <div className="ticket-item">
+                    <div
+                        key={slotKey}
+                        className="ticket-group"
+                    >
+                        <div
+                            className="ticket-item"
+                            onClick={(e) => {
+                                toggleGroup(slotKey);
+                            }}
+                        >
                             {/* Main clickable area for modal */}
                             <div
                                 className="ticket-main"
                                 style={{ display: "flex", flex: 1, cursor: "pointer" }}
-                                onClick={(e) => {
-                                    toggleGroup(slotKey);
-                                }}
                             >
                                 <div className="ticket-time-slot">{slotKey}</div>
                                 <div className="ticket-details">

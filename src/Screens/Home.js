@@ -9,10 +9,22 @@ import { format, isSameDay } from 'date-fns';
 export default function Home() {
     const navigate = useNavigate();
     const [highlightDates, setHighlightDates] = useState([]);
+    const [token, setToken] = useState(null);
 
     useEffect(() => {
         const ticketDates = tickets.map(ticket => new Date(ticket.date));
         setHighlightDates(ticketDates);
+
+        // Expose window.setToken
+        window.setToken = (receivedToken) => {
+            console.log("Received token from native:", receivedToken);
+            setToken(receivedToken); // update token state
+        };
+
+        // Optional: cleanup
+        return () => {
+            delete window.setToken;
+        };
     }, []);
 
     const tileClassName = ({ date, view }) => {
@@ -44,6 +56,21 @@ export default function Home() {
                 onClickDay={onDateClick}
                 maxDate={new Date()}
             />
+
+            {token && (
+                <div
+                    className="token-display"
+                    style={{
+                        marginTop: "20px",
+                        padding: "10px",
+                        border: "1px dashed #ccc",
+                        backgroundColor: "#f9f9f9",
+                        fontSize: "24px",
+                        color: "blue",
+                    }}>
+                    <p><strong>Token:</strong> {token}</p>
+                </div>
+            )}
         </div>
     );
 }
