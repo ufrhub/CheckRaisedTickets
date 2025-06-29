@@ -57,20 +57,18 @@ export default function Home() {
                 maxDate={new Date()}
             />
 
-            {token && (
-                <div
-                    className="token-display"
-                    style={{
-                        marginTop: "20px",
-                        padding: "10px",
-                        border: "1px dashed #ccc",
-                        backgroundColor: "#f9f9f9",
-                        fontSize: "24px",
-                        color: "blue",
-                    }}>
-                    <p><strong>Token:</strong> {token}</p>
-                </div>
-            )}
+            <div
+                className="token-display"
+                style={{
+                    marginTop: "20px",
+                    padding: "10px",
+                    border: "1px dashed #ccc",
+                    backgroundColor: "#f9f9f9",
+                    fontSize: "24px",
+                    color: "blue",
+                }}>
+                <p><strong>Token:</strong> {token ? token : "No token found...!"}</p>
+            </div>
         </div>
     );
 }
