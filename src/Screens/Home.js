@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../Styles/Home.css';
+import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import tickets from '../tickets.json';
 import { format, isSameDay } from 'date-fns';
@@ -9,48 +10,87 @@ import { format, isSameDay } from 'date-fns';
 export default function Home() {
     const navigate = useNavigate();
     const [highlightDates, setHighlightDates] = useState([]);
-    const [token, setToken] = useState(null);
-    const tokenSet = useRef(false);
+    const [token, setToken] = useState({ source: null, value: null });
+    const [dropdownData, setDropdownData] = useState(null);
+    const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
+    const setPropertiesReference = useRef(false);
+
+    const customStyles = {
+        control: (base) => ({
+            ...base,
+            borderRadius: 8,
+            padding: '2px 4px',
+            borderColor: '#ccc',
+            boxShadow: 'none',
+            ':hover': {
+                borderColor: '#007bff'
+            },
+        }),
+        menu: (base) => ({
+            ...base,
+            zIndex: 9999,
+        }),
+    };
 
     useEffect(() => {
-        const ticketDates = tickets.map(ticket => new Date(ticket.date));
-        setHighlightDates(ticketDates);
-    }, []);
+        const setPropertiesOnce = ({ mToken, mSource, mDropdownData }) => {
+            if (!setPropertiesReference.current) {
+                setPropertiesReference.current = true;
+                if (mToken) {
+                    setToken({ source: mSource, value: mToken });
+                }
 
-    useEffect(() => {
-        const ticketDates = tickets.map(ticket => new Date(ticket.date));
-        setHighlightDates(ticketDates);
-
-        const setTokenOnce = (newToken, source) => {
-            if (!tokenSet.current && newToken) {
-                tokenSet.current = true;
-                setToken(source + ": " + newToken);
-                console.log(`✅ Token set from ${source}:`, newToken);
+                if (Array.isArray(mDropdownData) && mDropdownData.length > 0) {
+                    setDropdownData(mDropdownData);
+                    setSelectedOption({
+                        label: mDropdownData[0].name,
+                        value: mDropdownData[0].id
+                    });
+                }
+                console.log(`Token set from ${mSource}:`, mToken);
             } else {
-                console.log(`⛔ Ignored token from ${source} because token is already set`);
+                console.log(`Ignored token from ${mSource} because token is already set`);
             }
         };
 
         const queryParams = new URLSearchParams(window.location.search);
         const tokenFromUrl = queryParams.get('token');
-        setTokenOnce(tokenFromUrl, "URL");
+        setPropertiesOnce({ mToken: tokenFromUrl, mSource: "URL" });
 
         const handleMessage = (event) => {
             const message = event.data;
-            if (message && typeof message === "object" && "data" in message) {
-                setTokenOnce(message.data, "postMessage");
+
+            try {
+                const data = typeof message === "string" ? JSON.parse(message) : message;
+                const token = data.apiToken;
+                const result = data.result;
+
+                if (data && typeof data === "object" && "apiToken" in data && "result" in data) {
+                    setPropertiesOnce({
+                        mToken: token,
+                        mSource: "postMessage",
+                        mDropdownData: result
+                    });
+                }
+            } catch (error) {
+                console.warn("⚠️ Ignoring non-JSON postMessage:", message);
             }
         };
         window.addEventListener("message", handleMessage);
 
         window.setToken = (receivedToken) => {
-            setTokenOnce(receivedToken, "window.setToken");
+            setPropertiesOnce({ mToken: receivedToken, mSource: "window.setToken" });
         };
 
         return () => {
             window.removeEventListener("message", handleMessage);
             delete window.setToken;
         };
+    }, []);
+
+    useEffect(() => {
+        const ticketDates = tickets.map(ticket => new Date(ticket.date));
+        setHighlightDates(ticketDates);
     }, []);
 
     const tileClassName = ({ date, view }) => {
@@ -77,6 +117,24 @@ export default function Home() {
 
     return (
         <div className="container">
+            <div className="dropdown-wrapper">
+                <Select
+                    className="react-select-container"
+                    styles={customStyles}
+                    classNamePrefix="react-select"
+                    isSearchable={false}
+                    options={dropdownData.map(item => ({
+                        ...item,
+                        label: item.name,
+                        value: item.id
+                    }))}
+                    value={selectedOption}
+                    onChange={(selected) => {
+                        setSelectedOption({ label: selected.name, value: selected.id });
+                    }}
+                />
+            </div>
+
             <Calendar
                 tileClassName={tileClassName}
                 onClickDay={onDateClick}
