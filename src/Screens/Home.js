@@ -13,6 +13,7 @@ export default function Home() {
     const [token, setToken] = useState({ source: null, value: null });
     const [dropdownData, setDropdownData] = useState(null);
     const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
+    const [testToken, setTestToken] = useState(null);
     const setPropertiesReference = useRef(false);
 
     const customStyles = {
@@ -62,7 +63,6 @@ export default function Home() {
 
             try {
                 const data = typeof message === "string" ? JSON.parse(message) : message;
-                alert(JSON.stringify(data, null, 2));
                 const token = data.apiToken;
                 const result = data.result;
 
@@ -72,6 +72,10 @@ export default function Home() {
                         mSource: "postMessage",
                         mDropdownData: result
                     });
+                }
+
+                if (message && typeof message === "object" && "data" in message) {
+                    setTestToken(message.data, "postMessage");
                 }
             } catch (error) {
                 console.warn("⚠️ Ignoring non-JSON postMessage:", message);
@@ -149,18 +153,65 @@ export default function Home() {
                 maxDate={new Date()}
             />
 
-            <div
-                className="token-display"
-                style={{
-                    marginTop: "20px",
-                    padding: "10px",
-                    border: "1px dashed #ccc",
-                    backgroundColor: "#f9f9f9",
-                    fontSize: "24px",
-                    color: "blue",
-                }}>
-                <p><strong>Token:</strong> {token.value !== null ? token.value : "No token found...!"}</p>
-            </div>
+            {
+                token.value !== null
+                    ?
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Token:</strong> {token.value}</p>
+                    </div>
+                    :
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Token:</strong> "No token found...!"</p>
+                    </div>
+            }
+
+            {
+                testToken !== null
+                    ?
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Token-2:</strong> {testToken}</p>
+                    </div>
+                    :
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Token-2:</strong> "No token found...!"</p>
+                    </div>
+            }
         </div>
     );
 }
