@@ -14,6 +14,7 @@ export default function Home() {
     const [dropdownData, setDropdownData] = useState(null);
     const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
     const [testToken, setTestToken] = useState(null);
+    const [testToken2, setTestToken2] = useState(null);
     const setPropertiesReference = useRef(false);
 
     const customStyles = {
@@ -86,6 +87,9 @@ export default function Home() {
 
                 if (message && typeof message === "object" && "data" in message) {
                     setTestToken(message.data, "postMessage");
+
+                    const data = JSON.parse(message.data).apiToken;
+                    setTestToken2(data);
                 }
             } catch (error) {
                 console.warn("⚠️ Ignoring non-JSON postMessage:", message);
@@ -220,6 +224,36 @@ export default function Home() {
                             color: "blue",
                         }}>
                         <p><strong>Token-2:</strong> "No token found...!"</p>
+                    </div>
+            }
+
+            {
+                testToken2 !== null
+                    ?
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Token-3:</strong> {testToken2}</p>
+                    </div>
+                    :
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Token-3:</strong> "No token found...!"</p>
                     </div>
             }
         </div>
