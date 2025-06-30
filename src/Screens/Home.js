@@ -61,8 +61,8 @@ export default function Home() {
             const message = event.data;
 
             try {
-                alert(message)
                 const data = typeof message === "string" ? JSON.parse(message) : message;
+                alert(data)
                 const token = data.apiToken;
                 const result = data.result;
 
