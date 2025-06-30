@@ -3,8 +3,9 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../Styles/Home.css';
 import Select from 'react-select';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import tickets from '../tickets.json';
+// import tickets from '../tickets.json';
 import { format, isSameDay } from 'date-fns';
 
 export default function Home() {
@@ -13,8 +14,6 @@ export default function Home() {
     const [token, setToken] = useState({ source: null, value: null });
     const [dropdownData, setDropdownData] = useState(null);
     const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
-    const [testToken, setTestToken] = useState(null);
-    const [testToken2, setTestToken2] = useState(null);
 
     const customStyles = {
         control: (base) => ({
@@ -49,10 +48,6 @@ export default function Home() {
                         label: result[0].name,
                         value: result[0].id
                     });
-
-                    setTestToken(message.data, "postMessage");
-
-                    setTestToken2(receivedToken);
                 }
             } catch (error) {
                 console.warn("⚠️ Ignoring non-JSON postMessage:", message);
@@ -67,9 +62,30 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        const ticketDates = tickets.map(ticket => new Date(ticket.date));
-        setHighlightDates(ticketDates);
-    }, []);
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const result = response.data.result;
+                const extractedDates = Object.keys(result).map(date => new Date(date));
+
+                setHighlightDates(extractedDates);
+            } catch (error) {
+                console.error('Error fetching maintenance data:', error);
+            }
+        };
+
+        fetchData();
+    }, [selectedOption.value, token]);
+
+    // useEffect(() => {
+    //     const ticketDates = tickets.map(ticket => new Date(ticket.date));
+    //     setHighlightDates(ticketDates);
+    // }, []);
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
@@ -153,66 +169,6 @@ export default function Home() {
                             color: "blue",
                         }}>
                         <p><strong>Token:</strong> "No token found...!"</p>
-                    </div>
-            }
-
-            {
-                testToken !== null
-                    ?
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Token-2:</strong> {testToken}</p>
-                    </div>
-                    :
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Token-2:</strong> "No token found...!"</p>
-                    </div>
-            }
-
-            {
-                testToken2 !== null
-                    ?
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Token-3:</strong> {testToken2}</p>
-                    </div>
-                    :
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Token-3:</strong> "No token found...!"</p>
                     </div>
             }
         </div>

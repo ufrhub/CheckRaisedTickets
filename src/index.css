@@ -11,3 +11,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.dropdown-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0 0;
+}
+
+.react-select-container {
+  width: 50%;
+  margin: 1rem auto;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .react-select-container {
+    width: 95%;
+  }
+}

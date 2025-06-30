@@ -5,17 +5,6 @@
   font-family: sans-serif;
 }
 
-.dropdown-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0 0;
-}
-
-.react-select-container {
-  width: 50%;
-  margin: 1rem auto;
-}
-
 .tickets-header {
   display: flex;
   align-items: center;
@@ -234,10 +223,6 @@
   .tickets-container {
     margin: 0;
     padding: 0.3rem;
-  }
-
-  .react-select-container {
-    width: 95%;
   }
 
   .tickets-header {
