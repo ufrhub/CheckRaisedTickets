@@ -62,7 +62,7 @@ export default function Home() {
 
             try {
                 const data = typeof message === "string" ? JSON.parse(message) : message;
-                alert(data)
+                alert(JSON.stringify(data, null, 2));
                 const token = data.apiToken;
                 const result = data.result;
 
