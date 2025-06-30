@@ -50,7 +50,7 @@ export default function Home() {
                     });
                 }
             } catch (error) {
-                console.warn("⚠️ Ignoring non-JSON postMessage:", message);
+                console.warn("Ignoring non-JSON postMessage:", message);
             }
         };
         window.addEventListener("message", handleMessage);
@@ -63,24 +63,30 @@ export default function Home() {
 
     useEffect(() => {
         const fetchData = async () => {
+            // const url_with_token_required = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
+            const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
+
             try {
-                const response = await axios.get(`https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`, {
+                const response = await axios.get(url, {
                     headers: {
-                        Authorization: `Bearer ${token}`
+                        Authorization: `Bearer ${token.value}`
                     }
                 });
 
                 const result = response.data.result;
-                const extractedDates = Object.keys(result).map(date => new Date(date));
+                const dateStrings = Object.keys(result);
+                const dateObjects = dateStrings.map(date => new Date(date));
 
-                setHighlightDates(extractedDates);
+                setHighlightDates(dateObjects);
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);
             }
         };
 
-        fetchData();
-    }, [selectedOption.value, token]);
+        if (token.value !== null) {
+            fetchData();
+        }
+    }, [selectedOption.value, token.value]);
 
     // useEffect(() => {
     //     const ticketDates = tickets.map(ticket => new Date(ticket.date));
@@ -169,6 +175,36 @@ export default function Home() {
                             color: "blue",
                         }}>
                         <p><strong>Token:</strong> "No token found...!"</p>
+                    </div>
+            }
+
+            {
+                highlightDates.length > 0
+                    ?
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Highlight Dates:</strong> {JSON.stringify(highlightDates)}</p>
+                    </div>
+                    :
+                    <div
+                        className="token-display"
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            border: "1px dashed #ccc",
+                            backgroundColor: "#f9f9f9",
+                            fontSize: "24px",
+                            color: "blue",
+                        }}>
+                        <p><strong>Highlight Dates:</strong> "No highlight dates found...!"</p>
                     </div>
             }
         </div>
