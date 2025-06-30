@@ -21,23 +21,20 @@ export default function Home() {
         const ticketDates = tickets.map(ticket => new Date(ticket.date));
         setHighlightDates(ticketDates);
 
-        // Utility: only sets token if it hasn't been set yet
         const setTokenOnce = (newToken, source) => {
             if (!tokenSet.current && newToken) {
                 tokenSet.current = true;
-                setToken(newToken);
+                setToken(source + ": " + newToken);
                 console.log(`✅ Token set from ${source}:`, newToken);
             } else {
                 console.log(`⛔ Ignored token from ${source} because token is already set`);
             }
         };
 
-        // 1. Try to get token from URL
         const queryParams = new URLSearchParams(window.location.search);
         const tokenFromUrl = queryParams.get('token');
         setTokenOnce(tokenFromUrl, "URL");
 
-        // 2. Listen to messages from postMessage
         const handleMessage = (event) => {
             const message = event.data;
             if (message && typeof message === "object" && "data" in message) {
@@ -46,12 +43,10 @@ export default function Home() {
         };
         window.addEventListener("message", handleMessage);
 
-        // 3. Expose window.setToken for native WebView
         window.setToken = (receivedToken) => {
             setTokenOnce(receivedToken, "window.setToken");
         };
 
-        // Cleanup
         return () => {
             window.removeEventListener("message", handleMessage);
             delete window.setToken;
