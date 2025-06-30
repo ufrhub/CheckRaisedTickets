@@ -62,10 +62,10 @@ export default function Home() {
             const message = event.data;
 
             try {
-                const data = typeof message === "object" && "data" in message ? JSON.parse(message.data) : message.data;
-
-                const token = data.apiToken;
-                const result = data.result;
+                // const data = typeof message === "object" && "data" in message ? JSON.parse(message.data) : message.data;
+                const data = message?.data;
+                const token = data?.apiToken;
+                const result = data?.result;
 
                 setPropertiesOnce({
                     mToken: token,
