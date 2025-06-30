@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../Styles/Home.css';
@@ -15,7 +15,6 @@ export default function Home() {
     const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
     const [testToken, setTestToken] = useState(null);
     const [testToken2, setTestToken2] = useState(null);
-    // const setPropertiesReference = useRef(false);
 
     const customStyles = {
         control: (base) => ({
@@ -35,79 +34,31 @@ export default function Home() {
     };
 
     useEffect(() => {
-        // const setPropertiesOnce = ({ mToken, mSource, mDropdownData }) => {
-        //     if (!setPropertiesReference.current) {
-        //         setPropertiesReference.current = true;
-        //         if (mToken) {
-        //             setToken({ source: mSource, value: mToken });
-        //         }
-
-        //         if (Array.isArray(mDropdownData) && mDropdownData.length > 0) {
-        //             setDropdownData(mDropdownData);
-        //             setSelectedOption({
-        //                 label: mDropdownData[0].name,
-        //                 value: mDropdownData[0].id
-        //             });
-        //         }
-        //         console.log(`Token set from ${mSource}:`, mToken);
-        //     } else {
-        //         console.log(`Ignored token from ${mSource} because token is already set`);
-        //     }
-        // };
-
-        // const queryParams = new URLSearchParams(window.location.search);
-        // const tokenFromUrl = queryParams.get('token');
-        // setPropertiesOnce({ mToken: tokenFromUrl, mSource: "URL" });
-
         const handleMessage = (event) => {
             const message = event.data;
 
             try {
-                // const data = typeof message === "object" && "data" in message ? JSON.parse(message.data) : message.data;
-
-
-                // if (data && typeof data === "object" && "apiToken" in data && "result" in data) {
-                //     const token = data.apiToken;
-                //     const result = data.result;
-
-                //     setPropertiesOnce({
-                //         mToken: token,
-                //         mSource: "postMessage",
-                //         mDropdownData: result
-                //     });
-                // }
-
                 if (message && typeof message === "object" && "data" in message) {
                     const data = JSON.parse(message.data);
-                    const token = data.apiToken;
+                    const receivedToken = data.apiToken;
                     const result = data.result;
 
-                    setToken({ source: "postMessage", value: token });
+                    setToken({ source: "postMessage", value: receivedToken });
                     setDropdownData(result);
                     setSelectedOption({
                         label: result[0].name,
                         value: result[0].id
                     });
 
-                    // setPropertiesOnce({
-                    //     mToken: token,
-                    //     mSource: "postMessage",
-                    //     mDropdownData: result
-                    // });
-
                     setTestToken(message.data, "postMessage");
 
-                    setTestToken2(data.apiToken);
+                    setTestToken2(receivedToken);
                 }
             } catch (error) {
                 console.warn("⚠️ Ignoring non-JSON postMessage:", message);
             }
         };
         window.addEventListener("message", handleMessage);
-
-        // window.setToken = (receivedToken) => {
-        //     setPropertiesOnce({ mToken: receivedToken, mSource: "window.setToken" });
-        // };
 
         return () => {
             window.removeEventListener("message", handleMessage);
