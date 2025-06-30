@@ -64,15 +64,7 @@ export default function Home() {
 
             try {
                 // const data = typeof message === "object" && "data" in message ? JSON.parse(message.data) : message.data;
-                const data = JSON.parse(message.data);
-                const token = data?.apiToken;
-                const result = data?.result;
 
-                setPropertiesOnce({
-                    mToken: token,
-                    mSource: "postMessage",
-                    mDropdownData: result
-                });
 
                 // if (data && typeof data === "object" && "apiToken" in data && "result" in data) {
                 //     const token = data.apiToken;
@@ -86,10 +78,19 @@ export default function Home() {
                 // }
 
                 if (message && typeof message === "object" && "data" in message) {
+                    const data = JSON.parse(message.data);
+                    const token = data.apiToken;
+                    const result = data.result;
+
+                    setPropertiesOnce({
+                        mToken: token,
+                        mSource: "postMessage",
+                        mDropdownData: result
+                    });
+
                     setTestToken(message.data, "postMessage");
 
-                    const data = JSON.parse(message.data).apiToken;
-                    setTestToken2(data);
+                    setTestToken2(data.apiToken);
                 }
             } catch (error) {
                 console.warn("⚠️ Ignoring non-JSON postMessage:", message);
