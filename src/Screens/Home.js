@@ -61,6 +61,7 @@ export default function Home() {
             const message = event.data;
 
             try {
+                alert(message)
                 const data = typeof message === "string" ? JSON.parse(message) : message;
                 const token = data.apiToken;
                 const result = data.result;
@@ -158,7 +159,7 @@ export default function Home() {
                     fontSize: "24px",
                     color: "blue",
                 }}>
-                <p><strong>Token:</strong> {token.value ? token.value : "No token found...!"}</p>
+                <p><strong>Token:</strong> {token.value !== null ? token.value : "No token found...!"}</p>
             </div>
         </div>
     );
