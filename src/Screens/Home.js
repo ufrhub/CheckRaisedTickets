@@ -15,7 +15,7 @@ export default function Home() {
     const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
     const [testToken, setTestToken] = useState(null);
     const [testToken2, setTestToken2] = useState(null);
-    const setPropertiesReference = useRef(false);
+    // const setPropertiesReference = useRef(false);
 
     const customStyles = {
         control: (base) => ({
@@ -35,29 +35,29 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const setPropertiesOnce = ({ mToken, mSource, mDropdownData }) => {
-            if (!setPropertiesReference.current) {
-                setPropertiesReference.current = true;
-                if (mToken) {
-                    setToken({ source: mSource, value: mToken });
-                }
+        // const setPropertiesOnce = ({ mToken, mSource, mDropdownData }) => {
+        //     if (!setPropertiesReference.current) {
+        //         setPropertiesReference.current = true;
+        //         if (mToken) {
+        //             setToken({ source: mSource, value: mToken });
+        //         }
 
-                if (Array.isArray(mDropdownData) && mDropdownData.length > 0) {
-                    setDropdownData(mDropdownData);
-                    setSelectedOption({
-                        label: mDropdownData[0].name,
-                        value: mDropdownData[0].id
-                    });
-                }
-                console.log(`Token set from ${mSource}:`, mToken);
-            } else {
-                console.log(`Ignored token from ${mSource} because token is already set`);
-            }
-        };
+        //         if (Array.isArray(mDropdownData) && mDropdownData.length > 0) {
+        //             setDropdownData(mDropdownData);
+        //             setSelectedOption({
+        //                 label: mDropdownData[0].name,
+        //                 value: mDropdownData[0].id
+        //             });
+        //         }
+        //         console.log(`Token set from ${mSource}:`, mToken);
+        //     } else {
+        //         console.log(`Ignored token from ${mSource} because token is already set`);
+        //     }
+        // };
 
-        const queryParams = new URLSearchParams(window.location.search);
-        const tokenFromUrl = queryParams.get('token');
-        setPropertiesOnce({ mToken: tokenFromUrl, mSource: "URL" });
+        // const queryParams = new URLSearchParams(window.location.search);
+        // const tokenFromUrl = queryParams.get('token');
+        // setPropertiesOnce({ mToken: tokenFromUrl, mSource: "URL" });
 
         const handleMessage = (event) => {
             const message = event.data;
@@ -82,11 +82,18 @@ export default function Home() {
                     const token = data.apiToken;
                     const result = data.result;
 
-                    setPropertiesOnce({
-                        mToken: token,
-                        mSource: "postMessage",
-                        mDropdownData: result
+                    setToken({ source: "postMessage", value: token });
+                    setDropdownData(result);
+                    setSelectedOption({
+                        label: result[0].name,
+                        value: result[0].id
                     });
+
+                    // setPropertiesOnce({
+                    //     mToken: token,
+                    //     mSource: "postMessage",
+                    //     mDropdownData: result
+                    // });
 
                     setTestToken(message.data, "postMessage");
 
@@ -98,9 +105,9 @@ export default function Home() {
         };
         window.addEventListener("message", handleMessage);
 
-        window.setToken = (receivedToken) => {
-            setPropertiesOnce({ mToken: receivedToken, mSource: "window.setToken" });
-        };
+        // window.setToken = (receivedToken) => {
+        //     setPropertiesOnce({ mToken: receivedToken, mSource: "window.setToken" });
+        // };
 
         return () => {
             window.removeEventListener("message", handleMessage);
