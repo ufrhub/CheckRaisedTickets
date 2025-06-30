@@ -117,23 +117,30 @@ export default function Home() {
 
     return (
         <div className="container">
-            <div className="dropdown-wrapper">
-                <Select
-                    className="react-select-container"
-                    styles={customStyles}
-                    classNamePrefix="react-select"
-                    isSearchable={false}
-                    options={dropdownData.map(item => ({
-                        ...item,
-                        label: item.name,
-                        value: item.id
-                    }))}
-                    value={selectedOption}
-                    onChange={(selected) => {
-                        setSelectedOption({ label: selected.name, value: selected.id });
-                    }}
-                />
-            </div>
+            {
+                dropdownData &&
+                    dropdownData.length > 0
+                    ?
+                    <div className="dropdown-wrapper">
+                        <Select
+                            className="react-select-container"
+                            styles={customStyles}
+                            classNamePrefix="react-select"
+                            isSearchable={false}
+                            options={dropdownData.map(item => ({
+                                ...item,
+                                label: item.name,
+                                value: item.id
+                            }))}
+                            value={selectedOption}
+                            onChange={(selected) => {
+                                setSelectedOption({ label: selected.name, value: selected.id });
+                            }}
+                        />
+                    </div>
+                    :
+                    <></>
+            }
 
             <Calendar
                 tileClassName={tileClassName}
@@ -151,7 +158,7 @@ export default function Home() {
                     fontSize: "24px",
                     color: "blue",
                 }}>
-                <p><strong>Token:</strong> {token ? token : "No token found...!"}</p>
+                <p><strong>Token:</strong> {token.value ? token.value : "No token found...!"}</p>
             </div>
         </div>
     );
