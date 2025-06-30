@@ -62,18 +62,27 @@ export default function Home() {
             const message = event.data;
 
             try {
-                const data = typeof message.data === "string" ? JSON.parse(message.data) : message.data;
+                const data = typeof message === "object" && "data" in message ? JSON.parse(message.data) : message.data;
 
-                if (data && typeof data === "object" && "apiToken" in data && "result" in data) {
-                    const token = data.apiToken;
-                    const result = data.result;
+                const token = data.apiToken;
+                const result = data.result;
 
-                    setPropertiesOnce({
-                        mToken: token,
-                        mSource: "postMessage",
-                        mDropdownData: result
-                    });
-                }
+                setPropertiesOnce({
+                    mToken: token,
+                    mSource: "postMessage",
+                    mDropdownData: result
+                });
+
+                // if (data && typeof data === "object" && "apiToken" in data && "result" in data) {
+                //     const token = data.apiToken;
+                //     const result = data.result;
+
+                //     setPropertiesOnce({
+                //         mToken: token,
+                //         mSource: "postMessage",
+                //         mDropdownData: result
+                //     });
+                // }
 
                 if (message && typeof message === "object" && "data" in message) {
                     setTestToken(message.data, "postMessage");
