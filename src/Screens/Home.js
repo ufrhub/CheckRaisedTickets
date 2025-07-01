@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useApiContext } from '../ApiContext';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../Styles/Home.css';
@@ -8,12 +9,17 @@ import { useNavigate } from 'react-router-dom';
 import { format, isSameDay } from 'date-fns';
 
 export default function Home() {
-    const navigate = useNavigate();
-    const [highlightDates, setHighlightDates] = useState([]);
-    const [token, setToken] = useState({ source: null, value: null });
-    const [dropdownData, setDropdownData] = useState(null);
-    const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
+    const {
+        token, setToken,
+        dropdownData, setDropdownData,
+        tickets, setTickets,
+        highlightDates, setHighlightDates,
+        selectedOption, setSelectedOption,
+        setSelectedTicket,
+    } = useApiContext();
+
     const setPropertiesReference = useRef(false);
+    const navigate = useNavigate();
 
     const customStyles = {
         control: (base) => ({
@@ -105,7 +111,7 @@ export default function Home() {
             window.removeEventListener("message", handleMessage);
             delete window.setToken;
         };
-    }, []);
+    }, [setDropdownData, setSelectedOption, setToken]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -121,6 +127,8 @@ export default function Home() {
                 const response = await axios.get(url);
 
                 const result = response.data.result;
+                setTickets(result);
+                console.log(result);
                 const dateKeys = Object.keys(result);
                 const dateObjects = dateKeys.map(date => new Date(date));
 
@@ -133,7 +141,7 @@ export default function Home() {
         if (token.value !== null) {
             fetchData();
         }
-    }, [selectedOption.value, token.value]);
+    }, [selectedOption.value, setHighlightDates, setTickets, token.value]);
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
@@ -150,10 +158,17 @@ export default function Home() {
     };
 
     const onDateClick = date => {
+        const formatted = format(date, 'yyyy-MM-dd');
         const hasTickets = highlightDates.some(d => isSameDay(d, date));
-        if (hasTickets) {
-            const formatted = format(date, 'yyyy-MM-dd');
-            navigate(`/tickets/${formatted}`);
+
+        if (hasTickets && tickets && tickets[formatted]) {
+            const ticketDataForDay = tickets[formatted];
+            setSelectedTicket(ticketDataForDay);
+            navigate(`/tickets/${formatted}`, {
+                state: {
+                    ticketData: ticketDataForDay
+                }
+            });
         }
     };
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useApiContext } from "../ApiContext";
 import Select from "react-select";
 import ticketData from "../tickets.json";
 import GroupedTicketList from "../Components/GroupedTicketList";
@@ -16,9 +17,22 @@ const formatDisplayDate = (isoDateStr) => {
 };
 
 const TicketsRaised = () => {
-  const { date } = useParams();
-  const [selectedTicket, setSelectedTicket] = useState(null);
+  // const [selectedTicket, setSelectedTicket] = useState(null);
   const [selectedTitle, setSelectedTitle] = useState({ value: "All", label: "All" });
+
+
+  const { date } = useParams();
+  const location = useLocation();
+
+  const { selectedTicket, setSelectedTicket, tickets } = useApiContext();
+
+  const ticketDataForDay =
+    location.state?.ticketsForDate ||
+    selectedTicket ||
+    tickets?.[date] || {};
+
+  console.log(ticketDataForDay)
+
   const navigate = useNavigate();
 
   const customStyles = {
