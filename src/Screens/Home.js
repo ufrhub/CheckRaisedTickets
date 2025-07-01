@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../Styles/Home.css';
 import Select from 'react-select';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-// import tickets from '../tickets.json';
 import { format, isSameDay } from 'date-fns';
 
 export default function Home() {
@@ -14,6 +13,7 @@ export default function Home() {
     const [token, setToken] = useState({ source: null, value: null });
     const [dropdownData, setDropdownData] = useState(null);
     const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
+    const setPropertiesReference = useRef(false);
 
     const customStyles = {
         control: (base) => ({
@@ -33,27 +33,73 @@ export default function Home() {
     };
 
     useEffect(() => {
+        const setPropertiesOnce = ({ mSource, mToken, mDropdownData }) => {
+            if (!setPropertiesReference.current) {
+                setPropertiesReference.current = true;
+                if (mToken) {
+                    setToken({ source: mSource, value: mToken });
+                }
+
+                if (Array.isArray(mDropdownData) && mDropdownData.length > 0) {
+                    setDropdownData(mDropdownData);
+                    setSelectedOption({
+                        label: mDropdownData[0].name,
+                        value: mDropdownData[0].id
+                    });
+                }
+            } else {
+                console.warn(`Ignored token from ${mSource} because token is already set`);
+            }
+        };
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const paramsData = queryParams.get("params");
+        const handleParams = (params) => {
+            try {
+                if (params) {
+                    const decoded = decodeURIComponent(params);
+                    const parsedData = JSON.parse(decoded);
+                    const apiToken = parsedData.apiToken;
+                    const dropdownDataResult = parsedData.result;
+
+                    setPropertiesOnce({ mSource: "URL", mToken: apiToken, mDropdownData: dropdownDataResult });
+                }
+            } catch (error) {
+                console.warn("Ignoring non-JSON postMessage:", params.data);
+            }
+        }
+        handleParams(paramsData);
+
         const handleMessage = (event) => {
             const message = event.data;
 
             try {
                 if (message && typeof message === "object" && "data" in message) {
-                    const data = JSON.parse(message.data);
-                    const receivedToken = data.apiToken;
-                    const result = data.result;
+                    const parsedData = JSON.parse(message.data);
+                    const apiToken = parsedData.apiToken;
+                    const dropdownDataResult = parsedData.result;
 
-                    setToken({ source: "postMessage", value: receivedToken });
-                    setDropdownData(result);
-                    setSelectedOption({
-                        label: result[0].name,
-                        value: result[0].id
-                    });
+                    setPropertiesOnce({ mSource: "postMessage", mToken: apiToken, mDropdownData: dropdownDataResult });
                 }
             } catch (error) {
                 console.warn("Ignoring non-JSON postMessage:", message);
             }
         };
         window.addEventListener("message", handleMessage);
+
+        window.setToken = (receivedData) => {
+            try {
+                if (receivedData && typeof receivedData === "object" && "data" in receivedData) {
+                    const parsedData = JSON.parse(receivedData.data);
+                    const apiToken = parsedData.apiToken;
+                    const dropdownDataResult = parsedData.result;
+
+                    setPropertiesOnce({ mSource: "window.setToken", mToken: apiToken, mDropdownData: dropdownDataResult });
+                }
+            } catch (error) {
+                console.warn("Ignoring non-JSON postMessage:", receivedData.data);
+            }
+        };
 
         return () => {
             window.removeEventListener("message", handleMessage);
@@ -67,15 +113,16 @@ export default function Home() {
             const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
-                const response = await axios.get(url, {
-                    headers: {
-                        Authorization: `Bearer ${token.value}`
-                    }
-                });
+                // const response = await axios.get(url, {
+                //     headers: {
+                //         Authorization: `Bearer ${token.value}`
+                //     }
+                // });
+                const response = await axios.get(url);
 
                 const result = response.data.result;
-                const dateStrings = Object.keys(result);
-                const dateObjects = dateStrings.map(date => new Date(date));
+                const dateKeys = Object.keys(result);
+                const dateObjects = dateKeys.map(date => new Date(date));
 
                 setHighlightDates(dateObjects);
             } catch (error) {
@@ -87,11 +134,6 @@ export default function Home() {
             fetchData();
         }
     }, [selectedOption.value, token.value]);
-
-    // useEffect(() => {
-    //     const ticketDates = tickets.map(ticket => new Date(ticket.date));
-    //     setHighlightDates(ticketDates);
-    // }, []);
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
