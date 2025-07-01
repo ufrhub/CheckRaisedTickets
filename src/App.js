@@ -7,7 +7,7 @@ function App() {
     <Routes>
       <Route path="*" exact element={<Navigate to="/" />} />
       <Route path="/" exact element={<Home />} />
-      <Route path="/tickets/:date" exact element={<TicketsRaised />} />
+      <Route path="/tickets/:id/:date" exact element={<TicketsRaised />} />
     </Routes>
   )
 }

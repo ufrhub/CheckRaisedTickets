@@ -8,6 +8,23 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { format, isSameDay } from 'date-fns';
 
+const customStyles = {
+    control: (base) => ({
+        ...base,
+        borderRadius: 8,
+        padding: '2px 4px',
+        borderColor: '#ccc',
+        boxShadow: 'none',
+        ':hover': {
+            borderColor: '#007bff'
+        },
+    }),
+    menu: (base) => ({
+        ...base,
+        zIndex: 9999,
+    }),
+};
+
 export default function Home() {
     const {
         token, setToken,
@@ -15,103 +32,87 @@ export default function Home() {
         tickets, setTickets,
         highlightDates, setHighlightDates,
         selectedOption, setSelectedOption,
-        setSelectedTicket,
     } = useApiContext();
 
     const setPropertiesReference = useRef(false);
     const navigate = useNavigate();
 
-    const customStyles = {
-        control: (base) => ({
-            ...base,
-            borderRadius: 8,
-            padding: '2px 4px',
-            borderColor: '#ccc',
-            boxShadow: 'none',
-            ':hover': {
-                borderColor: '#007bff'
-            },
-        }),
-        menu: (base) => ({
-            ...base,
-            zIndex: 9999,
-        }),
-    };
-
     useEffect(() => {
-        const setPropertiesOnce = ({ mSource, mToken, mDropdownData }) => {
-            if (!setPropertiesReference.current) {
-                setPropertiesReference.current = true;
-                if (mToken) {
-                    setToken({ source: mSource, value: mToken });
-                }
+        if (token.value === null && dropdownData === null) {
+            const setPropertiesOnce = ({ mSource, mToken, mDropdownData }) => {
+                if (!setPropertiesReference.current) {
+                    setPropertiesReference.current = true;
+                    if (mToken) {
+                        setToken({ source: mSource, value: mToken });
+                    }
 
-                if (Array.isArray(mDropdownData) && mDropdownData.length > 0) {
-                    setDropdownData(mDropdownData);
-                    setSelectedOption({
-                        label: mDropdownData[0].name,
-                        value: mDropdownData[0].id
-                    });
+                    if (Array.isArray(mDropdownData) && mDropdownData.length > 0) {
+                        setDropdownData(mDropdownData);
+                        setSelectedOption({
+                            label: mDropdownData[0].name,
+                            value: mDropdownData[0].id
+                        });
+                    }
+                } else {
+                    console.warn(`Ignored token from ${mSource} because token is already set`);
                 }
-            } else {
-                console.warn(`Ignored token from ${mSource} because token is already set`);
+            };
+
+            const queryParams = new URLSearchParams(window.location.search);
+            const paramsData = queryParams.get("params");
+            const handleParams = (params) => {
+                try {
+                    if (params) {
+                        const decoded = decodeURIComponent(params);
+                        const parsedData = JSON.parse(decoded);
+                        const apiToken = parsedData.apiToken;
+                        const dropdownDataResult = parsedData.result;
+
+                        setPropertiesOnce({ mSource: "URL", mToken: apiToken, mDropdownData: dropdownDataResult });
+                    }
+                } catch (error) {
+                    console.warn("Ignoring non-JSON postMessage:", params.data);
+                }
             }
-        };
+            handleParams(paramsData);
 
-        const queryParams = new URLSearchParams(window.location.search);
-        const paramsData = queryParams.get("params");
-        const handleParams = (params) => {
-            try {
-                if (params) {
-                    const decoded = decodeURIComponent(params);
-                    const parsedData = JSON.parse(decoded);
-                    const apiToken = parsedData.apiToken;
-                    const dropdownDataResult = parsedData.result;
+            const handleMessage = (event) => {
+                const message = event.data;
 
-                    setPropertiesOnce({ mSource: "URL", mToken: apiToken, mDropdownData: dropdownDataResult });
+                try {
+                    if (message && typeof message === "object" && "data" in message) {
+                        const parsedData = JSON.parse(message.data);
+                        const apiToken = parsedData.apiToken;
+                        const dropdownDataResult = parsedData.result;
+
+                        setPropertiesOnce({ mSource: "postMessage", mToken: apiToken, mDropdownData: dropdownDataResult });
+                    }
+                } catch (error) {
+                    console.warn("Ignoring non-JSON postMessage:", message);
                 }
-            } catch (error) {
-                console.warn("Ignoring non-JSON postMessage:", params.data);
-            }
+            };
+            window.addEventListener("message", handleMessage);
+
+            window.setToken = (receivedData) => {
+                try {
+                    if (receivedData && typeof receivedData === "object" && "data" in receivedData) {
+                        const parsedData = JSON.parse(receivedData.data);
+                        const apiToken = parsedData.apiToken;
+                        const dropdownDataResult = parsedData.result;
+
+                        setPropertiesOnce({ mSource: "window.setToken", mToken: apiToken, mDropdownData: dropdownDataResult });
+                    }
+                } catch (error) {
+                    console.warn("Ignoring non-JSON postMessage:", receivedData.data);
+                }
+            };
+
+            return () => {
+                window.removeEventListener("message", handleMessage);
+                delete window.setToken;
+            };
         }
-        handleParams(paramsData);
-
-        const handleMessage = (event) => {
-            const message = event.data;
-
-            try {
-                if (message && typeof message === "object" && "data" in message) {
-                    const parsedData = JSON.parse(message.data);
-                    const apiToken = parsedData.apiToken;
-                    const dropdownDataResult = parsedData.result;
-
-                    setPropertiesOnce({ mSource: "postMessage", mToken: apiToken, mDropdownData: dropdownDataResult });
-                }
-            } catch (error) {
-                console.warn("Ignoring non-JSON postMessage:", message);
-            }
-        };
-        window.addEventListener("message", handleMessage);
-
-        window.setToken = (receivedData) => {
-            try {
-                if (receivedData && typeof receivedData === "object" && "data" in receivedData) {
-                    const parsedData = JSON.parse(receivedData.data);
-                    const apiToken = parsedData.apiToken;
-                    const dropdownDataResult = parsedData.result;
-
-                    setPropertiesOnce({ mSource: "window.setToken", mToken: apiToken, mDropdownData: dropdownDataResult });
-                }
-            } catch (error) {
-                console.warn("Ignoring non-JSON postMessage:", receivedData.data);
-            }
-        };
-
-        return () => {
-            window.removeEventListener("message", handleMessage);
-            delete window.setToken;
-        };
-    }, [setDropdownData, setSelectedOption, setToken]);
+    }, [dropdownData, setDropdownData, setSelectedOption, setToken, token.value]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -138,10 +139,10 @@ export default function Home() {
             }
         };
 
-        if (token.value !== null) {
+        if (token.value !== null && ((tickets.length === 0 && highlightDates.length === 0) || selectedOption.value !== null)) {
             fetchData();
         }
-    }, [selectedOption.value, setHighlightDates, setTickets, token.value]);
+    }, [highlightDates.length, selectedOption.value, setHighlightDates, setTickets, tickets.length, token.value]);
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
@@ -157,14 +158,14 @@ export default function Home() {
         return null;
     };
 
-    const onDateClick = date => {
+    const onDateClick = (date) => {
+        console.log("date: ", date);
         const formatted = format(date, 'yyyy-MM-dd');
         const hasTickets = highlightDates.some(d => isSameDay(d, date));
 
         if (hasTickets && tickets && tickets[formatted]) {
             const ticketDataForDay = tickets[formatted];
-            setSelectedTicket(ticketDataForDay);
-            navigate(`/tickets/${formatted}`, {
+            navigate(`/tickets/${selectedOption.value}/${formatted}`, {
                 state: {
                     ticketData: ticketDataForDay
                 }

@@ -1,10 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useApiContext } from "../ApiContext";
 import Select from "react-select";
 import ticketData from "../tickets.json";
 import GroupedTicketList from "../Components/GroupedTicketList";
 import "../Styles/TicketsRaised.css";
+import axios from "axios";
+import { isSameDay } from 'date-fns';
+
+const customStyles = {
+  control: (base) => ({
+    ...base,
+    borderRadius: 8,
+    padding: '2px 4px',
+    borderColor: '#ccc',
+    boxShadow: 'none',
+    ':hover': {
+      borderColor: '#007bff'
+    },
+  }),
+  menu: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
+};
 
 const formatDisplayDate = (isoDateStr) => {
   const [year, month, day] = isoDateStr.split("-");
@@ -17,40 +36,49 @@ const formatDisplayDate = (isoDateStr) => {
 };
 
 const TicketsRaised = () => {
-  // const [selectedTicket, setSelectedTicket] = useState(null);
+  const { id, date } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, } = useApiContext();
   const [selectedTitle, setSelectedTitle] = useState({ value: "All", label: "All" });
 
+  useEffect(() => {
+    const ticketDataState =
+      location.state?.ticketsForDate ||
+      tickets?.[date] || ticketDataForDay || {};
 
-  const { date } = useParams();
-  const location = useLocation();
+    setTicketDataForDay(ticketDataState);
 
-  const { selectedTicket, setSelectedTicket, tickets } = useApiContext();
+    const fetchData = async () => {
+      // const url_with_token_required = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
+      const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${id}`;
 
-  const ticketDataForDay =
-    location.state?.ticketsForDate ||
-    selectedTicket ||
-    tickets?.[date] || {};
+      try {
+        // const response = await axios.get(url, {
+        //     headers: {
+        //         Authorization: `Bearer ${token.value}`
+        //     }
+        // });
+        const response = await axios.get(url);
 
-  console.log(ticketDataForDay)
+        const result = response.data.result;
+        const dateKeys = Object.keys(result);
+        const dateObjects = dateKeys.map(date => new Date(date));
+        const hasTickets = dateObjects.some(d => isSameDay(d, date));
 
-  const navigate = useNavigate();
+        if (hasTickets) {
+          const mTicketData = result[date];
+          setTicketDataForDay(mTicketData);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-  const customStyles = {
-    control: (base) => ({
-      ...base,
-      borderRadius: 8,
-      padding: '2px 4px',
-      borderColor: '#ccc',
-      boxShadow: 'none',
-      ':hover': {
-        borderColor: '#007bff'
-      },
-    }),
-    menu: (base) => ({
-      ...base,
-      zIndex: 9999,
-    }),
-  };
+    if (!ticketDataState || Object.keys(ticketDataState).length === 0) {
+      fetchData();
+    }
+  }, [date, id, location.state?.ticketsForDate, setTicketDataForDay, ticketDataForDay, tickets]);
 
   const filteredTickets = ticketData.filter((ticket) => ticket.date === date);
 
@@ -61,10 +89,14 @@ const TicketsRaised = () => {
       .map((title) => ({ value: title, label: title }))
   ];
 
-  const titleFilteredTickets =
-    selectedTitle.value === "All"
-      ? filteredTickets
-      : filteredTickets.filter((ticket) => ticket.title === selectedTitle.value);
+  // const titleFilteredTickets =
+  //   selectedTitle.value === "All"
+  //     ? filteredTickets
+  //     : filteredTickets.filter((ticket) => ticket.title === selectedTitle.value);
+
+  const filteredTicketDataForDay = ticketDataForDay;
+
+  console.log("ticketDataForDay: ", ticketDataForDay);
 
   return (
     <div className="tickets-container">
@@ -87,16 +119,16 @@ const TicketsRaised = () => {
           className="back-icon-button"
           src={require("../Assets/left-arrow.svg").default}
           alt="Go-Back"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
         />
         <h2>{formatDisplayDate(date)}</h2>
       </div>
 
-      {filteredTickets.length === 0 ? (
+      {filteredTicketDataForDay.length === 0 ? (
         <p className="no-tickets">No tickets found for this date.</p>
       ) : (
         <GroupedTicketList
-          tickets={titleFilteredTickets}
+          tickets={filteredTicketDataForDay}
           onSelect={(ticket) => setSelectedTicket(ticket)}
         />
       )}
