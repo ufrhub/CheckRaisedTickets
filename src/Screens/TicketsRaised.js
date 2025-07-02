@@ -128,7 +128,7 @@ const TicketsRaised = () => {
           }))}
           value={selectedTitle}
           onChange={(selected) => {
-            setSelectedTitle(selected);
+            setSelectedTitle({ label: selected.name, value: selected.id });
           }}
         />
       </div>
