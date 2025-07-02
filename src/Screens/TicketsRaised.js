@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useApiContext } from "../ApiContext";
 import Select from "react-select";
-import ticketData from "../tickets.json";
 import GroupedTicketList from "../Components/GroupedTicketList";
 import "../Styles/TicketsRaised.css";
 import axios from "axios";
@@ -39,8 +38,33 @@ const TicketsRaised = () => {
   const { id, date } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, } = useApiContext();
+  const { token, selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, } = useApiContext();
   const [selectedTitle, setSelectedTitle] = useState({ value: "All", label: "All" });
+
+  const [technicians, setTechnicians] = useState({ value: "All", label: "All" });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const url = `https://app.propkey.app/public/api/auth/get-property-technician/${id}`;
+
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token.value}`
+          }
+        });
+
+        const result = response.data.result;
+        setTechnicians(result.data)
+      } catch (error) {
+        console.error('Error fetching technicians data:', error);
+      }
+    };
+
+    if (id && token.value) {
+      fetchData();
+    }
+  }, [id, token.value]);
 
   useEffect(() => {
     const ticketDataState =
@@ -80,15 +104,6 @@ const TicketsRaised = () => {
     }
   }, [date, id, location.state?.ticketsForDate, setTicketDataForDay, ticketDataForDay, tickets]);
 
-  const filteredTickets = ticketData.filter((ticket) => ticket.date === date);
-
-  const allTitles = [
-    { value: "All", label: "All" },
-    ...Array.from(new Set(filteredTickets.map((t) => t.title)))
-      .sort()
-      .map((title) => ({ value: title, label: title }))
-  ];
-
   // const titleFilteredTickets =
   //   selectedTitle.value === "All"
   //     ? filteredTickets
@@ -106,7 +121,7 @@ const TicketsRaised = () => {
           styles={customStyles}
           classNamePrefix="react-select"
           isSearchable={false}
-          options={allTitles}
+          options={technicians}
           value={selectedTitle}
           onChange={(selected) => {
             setSelectedTitle(selected);

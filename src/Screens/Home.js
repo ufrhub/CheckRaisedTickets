@@ -116,7 +116,7 @@ export default function Home() {
 
     useEffect(() => {
         const fetchData = async () => {
-            // const url_with_token_required = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
+            // const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
             const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
@@ -159,7 +159,6 @@ export default function Home() {
     };
 
     const onDateClick = (date) => {
-        console.log("date: ", date);
         const formatted = format(date, 'yyyy-MM-dd');
         const hasTickets = highlightDates.some(d => isSameDay(d, date));
 
