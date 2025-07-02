@@ -116,16 +116,16 @@ export default function Home() {
 
     useEffect(() => {
         const fetchData = async () => {
-            // const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
-            const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
+            const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
+            // const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
-                // const response = await axios.get(url, {
-                //     headers: {
-                //         Authorization: `Bearer ${token.value}`
-                //     }
-                // });
-                const response = await axios.get(url);
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token.value}`
+                    }
+                });
+                // const response = await axios.get(url);
 
                 const result = response.data.result;
                 setTickets(result);

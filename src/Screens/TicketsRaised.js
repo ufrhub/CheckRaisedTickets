@@ -55,7 +55,7 @@ const TicketsRaised = () => {
         });
 
         const result = response.data.result;
-        setTechnicians(result.data)
+        setTechnicians(result.data);
       } catch (error) {
         console.error('Error fetching technicians data:', error);
       }
@@ -121,7 +121,11 @@ const TicketsRaised = () => {
           styles={customStyles}
           classNamePrefix="react-select"
           isSearchable={false}
-          options={technicians}
+          options={technicians.map(item => ({
+            ...item,
+            label: item.name,
+            value: item.id
+          }))}
           value={selectedTitle}
           onChange={(selected) => {
             setSelectedTitle(selected);
