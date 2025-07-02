@@ -137,10 +137,10 @@ const TicketsRaised = () => {
         <div className="ticket-modal" onClick={() => setSelectedTicket(null)}>
           <div className="ticket-modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>{selectedTicket.title}</h3>
-            <p><strong>Issue:</strong> {selectedTicket.issue}</p>
-            <p><strong>Street:</strong> {selectedTicket.street}</p>
-            <p><strong>Contact No:</strong> {selectedTicket.contactNo}</p>
-            <p><strong>Eno:</strong> {selectedTicket.eNo}</p>
+            <p><strong>Technician:</strong> {selectedTicket.assignto}</p>
+            <p><strong>Name:</strong> {selectedTicket.name}</p>
+            <p><strong>Category:</strong> {selectedTicket.sub_category}</p>
+            <p><strong>Eno:</strong> {selectedTicket.unit}</p>
 
             <div className="ticket-modal-footer">
               <button onClick={() => setSelectedTicket(null)}>Close</button>
