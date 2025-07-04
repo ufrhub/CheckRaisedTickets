@@ -118,24 +118,23 @@ export default function Home() {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(false);
-            const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
-            // const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
+            setLoading(true);
+            // const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
+            const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
-                const response = await axios.get(url, {
-                    headers: {
-                        Authorization: `Bearer ${token.value}`
-                    }
-                });
-                // const response = await axios.get(url);
+                // const response = await axios.get(url, {
+                //     headers: {
+                //         Authorization: `Bearer ${token.value}`
+                //     }
+                // });
+                const response = await axios.get(url);
 
                 const result = response.data.result;
-                setTickets(result);
-                console.log(result);
                 const dateKeys = Object.keys(result);
                 const dateObjects = dateKeys.map(date => new Date(date));
 
+                setTickets(result);
                 setHighlightDates(dateObjects);
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useApiContext } from "../ApiContext";
 import Select from "react-select";
@@ -6,6 +6,7 @@ import GroupedTicketList from "../Components/GroupedTicketList";
 import "../Styles/TicketsRaised.css";
 import axios from "axios";
 import { isSameDay } from 'date-fns';
+import Loader from '../Components/Loader';
 
 const customStyles = {
   control: (base) => ({
@@ -38,13 +39,13 @@ const TicketsRaised = () => {
   const { id, date } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { token, selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, } = useApiContext();
+  const { token, selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, technicians, setTechnicians } = useApiContext();
   const [selectedTitle, setSelectedTitle] = useState({ value: "All", label: "All" });
-
-  const [technicians, setTechnicians] = useState({ value: "All", label: "All" });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const url = `https://app.propkey.app/public/api/auth/get-property-technician/${id}`;
 
       try {
@@ -58,13 +59,15 @@ const TicketsRaised = () => {
         setTechnicians(result.data);
       } catch (error) {
         console.error('Error fetching technicians data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     if (id && token.value) {
       fetchData();
     }
-  }, [id, token.value]);
+  }, [id, setTechnicians, token.value]);
 
   useEffect(() => {
     const ticketDataState =
@@ -74,6 +77,7 @@ const TicketsRaised = () => {
     setTicketDataForDay(ticketDataState);
 
     const fetchData = async () => {
+      setLoading(true);
       // const url_with_token_required = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
       const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${id}`;
 
@@ -96,6 +100,8 @@ const TicketsRaised = () => {
         }
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -111,63 +117,69 @@ const TicketsRaised = () => {
 
   const filteredTicketDataForDay = ticketDataForDay;
 
-  console.log("ticketDataForDay: ", ticketDataForDay);
-
   return (
-    <div className="tickets-container">
-      <div className="dropdown-wrapper">
-        <Select
-          className="react-select-container"
-          styles={customStyles}
-          classNamePrefix="react-select"
-          isSearchable={false}
-          options={technicians.map(item => ({
-            ...item,
-            label: item.name,
-            value: item.id
-          }))}
-          value={selectedTitle}
-          onChange={(selected) => {
-            setSelectedTitle({ label: selected.name, value: selected.id });
-          }}
-        />
-      </div>
-
-      <div className="tickets-header">
-        <img
-          className="back-icon-button"
-          src={require("../Assets/left-arrow.svg").default}
-          alt="Go-Back"
-          onClick={() => navigate(-1)}
-        />
-        <h2>{formatDisplayDate(date)}</h2>
-      </div>
-
-      {filteredTicketDataForDay.length === 0 ? (
-        <p className="no-tickets">No tickets found for this date.</p>
-      ) : (
-        <GroupedTicketList
-          tickets={filteredTicketDataForDay}
-          onSelect={(ticket) => setSelectedTicket(ticket)}
-        />
-      )}
-
-      {selectedTicket && (
-        <div className="ticket-modal" onClick={() => setSelectedTicket(null)}>
-          <div className="ticket-modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>{selectedTicket.title}</h3>
-            <p><strong>Technician:</strong> {selectedTicket.assignto}</p>
-            <p><strong>Name:</strong> {selectedTicket.name}</p>
-            <p><strong>Category:</strong> {selectedTicket.sub_category}</p>
-            <p><strong>Eno:</strong> {selectedTicket.unit}</p>
-
-            <div className="ticket-modal-footer">
-              <button onClick={() => setSelectedTicket(null)}>Close</button>
+    <React.Fragment>
+      {
+        loading ? (
+          <Loader />
+        ) : (
+          <div className="tickets-container">
+            <div className="dropdown-wrapper">
+              <Select
+                className="react-select-container"
+                styles={customStyles}
+                classNamePrefix="react-select"
+                isSearchable={false}
+                options={technicians.map(item => ({
+                  ...item,
+                  label: item.name,
+                  value: item.id
+                }))}
+                value={selectedTitle}
+                onChange={(selected) => {
+                  setSelectedTitle({ label: selected.name, value: selected.id });
+                }}
+              />
             </div>
+
+            <div className="tickets-header">
+              <img
+                className="back-icon-button"
+                src={require("../Assets/left-arrow.svg").default}
+                alt="Go-Back"
+                onClick={() => navigate(-1)}
+              />
+              <h2>{formatDisplayDate(date)}</h2>
+            </div>
+
+            {filteredTicketDataForDay.length === 0 ? (
+              <p className="no-tickets">No tickets found for this date.</p>
+            ) : (
+              <GroupedTicketList
+                tickets={filteredTicketDataForDay}
+                onSelect={(ticket) => setSelectedTicket(ticket)}
+              />
+            )}
+
+            {selectedTicket && (
+              <div className="ticket-modal" onClick={() => setSelectedTicket(null)}>
+                <div className="ticket-modal-content" onClick={(e) => e.stopPropagation()}>
+                  <h3>{selectedTicket.title}</h3>
+                  <p><strong>Technician:</strong> {selectedTicket.assignto}</p>
+                  <p><strong>Name:</strong> {selectedTicket.name}</p>
+                  <p><strong>Category:</strong> {selectedTicket.sub_category}</p>
+                  <p><strong>Eno:</strong> {selectedTicket.unit}</p>
+
+                  <div className="ticket-modal-footer">
+                    <button onClick={() => setSelectedTicket(null)}>Close</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </React.Fragment>
   );
 };
 
