@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useApiContext } from '../ApiContext';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -7,6 +7,7 @@ import Select from 'react-select';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { format, isSameDay } from 'date-fns';
+import Loader from '../Components/Loader';
 
 const customStyles = {
     control: (base) => ({
@@ -33,6 +34,7 @@ export default function Home() {
         highlightDates, setHighlightDates,
         selectedOption, setSelectedOption,
     } = useApiContext();
+    const [loading, setLoading] = useState(true);
 
     const setPropertiesReference = useRef(false);
     const navigate = useNavigate();
@@ -116,16 +118,16 @@ export default function Home() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
-            // const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
+            // const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
+            const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
-                const response = await axios.get(url, {
-                    headers: {
-                        Authorization: `Bearer ${token.value}`
-                    }
-                });
-                // const response = await axios.get(url);
+                // const response = await axios.get(url, {
+                //     headers: {
+                //         Authorization: `Bearer ${token.value}`
+                //     }
+                // });
+                const response = await axios.get(url);
 
                 const result = response.data.result;
                 setTickets(result);
@@ -136,6 +138,8 @@ export default function Home() {
                 setHighlightDates(dateObjects);
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -173,97 +177,106 @@ export default function Home() {
     };
 
     return (
-        <div className="container">
+        <React.Fragment>
             {
-                dropdownData &&
-                    dropdownData.length > 0
-                    ?
-                    <div className="dropdown-wrapper">
-                        <Select
-                            className="react-select-container"
-                            styles={customStyles}
-                            classNamePrefix="react-select"
-                            isSearchable={false}
-                            options={dropdownData.map(item => ({
-                                ...item,
-                                label: item.name,
-                                value: item.id
-                            }))}
-                            value={selectedOption}
-                            onChange={(selected) => {
-                                setSelectedOption({ label: selected.name, value: selected.id });
-                            }}
-                        />
-                    </div>
-                    :
-                    <></>
-            }
+                loading ? (
+                    <Loader />
+                ) :
+                    (
+                        <div className="container">
+                            {
+                                dropdownData &&
+                                    dropdownData.length > 0
+                                    ?
+                                    <div className="dropdown-wrapper">
+                                        <Select
+                                            className="react-select-container"
+                                            styles={customStyles}
+                                            classNamePrefix="react-select"
+                                            isSearchable={false}
+                                            options={dropdownData.map(item => ({
+                                                ...item,
+                                                label: item.name,
+                                                value: item.id
+                                            }))}
+                                            value={selectedOption}
+                                            onChange={(selected) => {
+                                                setSelectedOption({ label: selected.name, value: selected.id });
+                                            }}
+                                        />
+                                    </div>
+                                    :
+                                    <></>
+                            }
 
-            <Calendar
-                tileClassName={tileClassName}
-                onClickDay={onDateClick}
-                maxDate={new Date()}
-            />
+                            <Calendar
+                                tileClassName={tileClassName}
+                                onClickDay={onDateClick}
+                                maxDate={new Date()}
+                            />
 
-            {
-                token.value !== null
-                    ?
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Token:</strong> {token.value}</p>
-                    </div>
-                    :
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Token:</strong> "No token found...!"</p>
-                    </div>
-            }
+                            {
+                                token.value !== null
+                                    ?
+                                    <div
+                                        className="token-display"
+                                        style={{
+                                            marginTop: "20px",
+                                            padding: "10px",
+                                            border: "1px dashed #ccc",
+                                            backgroundColor: "#f9f9f9",
+                                            fontSize: "24px",
+                                            color: "blue",
+                                        }}>
+                                        <p><strong>Token:</strong> {token.value}</p>
+                                    </div>
+                                    :
+                                    <div
+                                        className="token-display"
+                                        style={{
+                                            marginTop: "20px",
+                                            padding: "10px",
+                                            border: "1px dashed #ccc",
+                                            backgroundColor: "#f9f9f9",
+                                            fontSize: "24px",
+                                            color: "blue",
+                                        }}>
+                                        <p><strong>Token:</strong> "No token found...!"</p>
+                                    </div>
+                            }
 
-            {
-                highlightDates.length > 0
-                    ?
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Highlight Dates:</strong> {JSON.stringify(highlightDates)}</p>
-                    </div>
-                    :
-                    <div
-                        className="token-display"
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px",
-                            border: "1px dashed #ccc",
-                            backgroundColor: "#f9f9f9",
-                            fontSize: "24px",
-                            color: "blue",
-                        }}>
-                        <p><strong>Highlight Dates:</strong> "No highlight dates found...!"</p>
-                    </div>
+                            {
+                                highlightDates.length > 0
+                                    ?
+                                    <div
+                                        className="token-display"
+                                        style={{
+                                            marginTop: "20px",
+                                            padding: "10px",
+                                            border: "1px dashed #ccc",
+                                            backgroundColor: "#f9f9f9",
+                                            fontSize: "24px",
+                                            color: "blue",
+                                        }}>
+                                        <p><strong>Highlight Dates:</strong> {JSON.stringify(highlightDates)}</p>
+                                    </div>
+                                    :
+                                    <div
+                                        className="token-display"
+                                        style={{
+                                            marginTop: "20px",
+                                            padding: "10px",
+                                            border: "1px dashed #ccc",
+                                            backgroundColor: "#f9f9f9",
+                                            fontSize: "24px",
+                                            color: "blue",
+                                        }}>
+                                        <p><strong>Highlight Dates:</strong> "No highlight dates found...!"</p>
+                                    </div>
+                            }
+                        </div>
+                    )
             }
-        </div>
+        </React.Fragment>
     );
 }
