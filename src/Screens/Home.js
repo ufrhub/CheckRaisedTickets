@@ -212,7 +212,7 @@ export default function Home() {
                             <Calendar
                                 tileClassName={tileClassName}
                                 onClickDay={onDateClick}
-                                maxDate={new Date()}
+                                // maxDate={new Date()}
                             />
 
                             {
