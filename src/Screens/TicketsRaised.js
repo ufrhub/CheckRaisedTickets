@@ -119,7 +119,6 @@ const TicketsRaised = () => {
 
     for (const time in ticketDataForDay) {
       const tickets = ticketDataForDay[time];
-      // const matches = tickets.filter(t => t.assign_to_id === selectedTechnician.value);
       const matches = tickets.filter(t => Number(t.assign_to_id) === Number(selectedTechnician.value));
 
       if (matches.length) {
