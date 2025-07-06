@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useApiContext } from "../ApiContext";
 import Select from "react-select";
@@ -40,7 +40,7 @@ const TicketsRaised = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { token, selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, technicians, setTechnicians } = useApiContext();
-  const [selectedTitle, setSelectedTitle] = useState({ value: "All", label: "All" });
+  const [selectedTechnician, setSelectedTechnician] = useState({ value: "All", label: "All" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -110,12 +110,31 @@ const TicketsRaised = () => {
     }
   }, [date, id, location.state?.ticketsForDate, setTicketDataForDay, ticketDataForDay, tickets]);
 
-  // const titleFilteredTickets =
-  //   selectedTitle.value === "All"
-  //     ? filteredTickets
-  //     : filteredTickets.filter((ticket) => ticket.title === selectedTitle.value);
+  const filteredTicketDataForDay = useMemo(() => {
+    if (selectedTechnician.value === 'All') {
+      return ticketDataForDay || {};
+    }
 
-  const filteredTicketDataForDay = ticketDataForDay;
+    const filteredTickets = {};
+
+    for (const time in ticketDataForDay) {
+      const tickets = ticketDataForDay[time];
+      const matches = tickets.filter(t => t.assign_to_id === selectedTechnician.value);
+
+      if (matches.length) {
+        filteredTickets[time] = matches;
+      }
+      // OR
+      // To preserve empty keys:
+      // filteredTickets[time] = matches;
+    }
+
+
+    return filteredTickets;
+  }, [ticketDataForDay, selectedTechnician.value]);
+
+  console.log("ticketDataForDay: ", ticketDataForDay);
+  console.log("filteredTicketDataForDay: ", filteredTicketDataForDay);
 
   return (
     <React.Fragment>
@@ -135,9 +154,9 @@ const TicketsRaised = () => {
                   label: item.name,
                   value: item.id
                 }))}
-                value={selectedTitle}
+                value={selectedTechnician}
                 onChange={(selected) => {
-                  setSelectedTitle({ label: selected.name, value: selected.id });
+                  setSelectedTechnician({ label: selected.name, value: selected.id });
                 }}
               />
             </div>
