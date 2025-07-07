@@ -154,9 +154,11 @@ export default function Home() {
         const isToday = isSameDay(date, new Date());
         const isTicketDate = highlightDates.some(d => isSameDay(d, date));
         const isFuture = date > new Date();
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
         if (isTicketDate) return 'highlight';
         if (isToday) return 'today-border';
+        if (isFuture && isWeekend) return 'future-weekend';
         if (isFuture) return 'future-date';
 
         return null;
@@ -212,68 +214,8 @@ export default function Home() {
                             <Calendar
                                 tileClassName={tileClassName}
                                 onClickDay={onDateClick}
-                                // maxDate={new Date()}
+                            // maxDate={new Date()}
                             />
-
-                            {
-                                token.value !== null
-                                    ?
-                                    <div
-                                        className="token-display"
-                                        style={{
-                                            marginTop: "20px",
-                                            padding: "10px",
-                                            border: "1px dashed #ccc",
-                                            backgroundColor: "#f9f9f9",
-                                            fontSize: "24px",
-                                            color: "blue",
-                                        }}>
-                                        <p><strong>Token:</strong> {token.value}</p>
-                                    </div>
-                                    :
-                                    <div
-                                        className="token-display"
-                                        style={{
-                                            marginTop: "20px",
-                                            padding: "10px",
-                                            border: "1px dashed #ccc",
-                                            backgroundColor: "#f9f9f9",
-                                            fontSize: "24px",
-                                            color: "blue",
-                                        }}>
-                                        <p><strong>Token:</strong> "No token found...!"</p>
-                                    </div>
-                            }
-
-                            {
-                                highlightDates.length > 0
-                                    ?
-                                    <div
-                                        className="token-display"
-                                        style={{
-                                            marginTop: "20px",
-                                            padding: "10px",
-                                            border: "1px dashed #ccc",
-                                            backgroundColor: "#f9f9f9",
-                                            fontSize: "24px",
-                                            color: "blue",
-                                        }}>
-                                        <p><strong>Highlight Dates:</strong> {JSON.stringify(highlightDates)}</p>
-                                    </div>
-                                    :
-                                    <div
-                                        className="token-display"
-                                        style={{
-                                            marginTop: "20px",
-                                            padding: "10px",
-                                            border: "1px dashed #ccc",
-                                            backgroundColor: "#f9f9f9",
-                                            fontSize: "24px",
-                                            color: "blue",
-                                        }}>
-                                        <p><strong>Highlight Dates:</strong> "No highlight dates found...!"</p>
-                                    </div>
-                            }
                         </div>
                     )
             }

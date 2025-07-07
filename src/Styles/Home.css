@@ -36,8 +36,16 @@
   border-radius: 4px;
 }
 
-.react-calendar__month-view__days__day--weekend:not(.react-calendar__month-view__days__day--neighboringMonth):not(.future-date) {
+/* .react-calendar__month-view__days__day--weekend:not(.react-calendar__month-view__days__day--neighboringMonth):not(.future-date) {
   color: inherit;
+} */
+
+.react-calendar__month-view__days__day--weekend {
+  color: inherit !important;
+}
+
+.future-weekend {
+  color: #333 !important; /* or any color you like */
 }
 
 .highlight {
