@@ -140,7 +140,7 @@ const TicketsRaised = () => {
           <div className="tickets-container">
             {
               technicians &&
-                isSupervisor &&
+                isSupervisor === "true" &&
                 technicians.length > 1
                 ?
                 <div className="dropdown-wrapper">

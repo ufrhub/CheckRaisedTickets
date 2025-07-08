@@ -174,7 +174,7 @@ export default function Home() {
 
         if (hasTickets && tickets && tickets[formatted]) {
             const ticketDataForDay = tickets[formatted];
-            navigate(`/tickets/${selectedOption.value}/${isSupervisor}/${formatted}`, {
+            navigate(`/tickets/${selectedOption.value}/${String(isSupervisor)}/${formatted}`, {
                 state: {
                     ticketData: ticketDataForDay
                 }
