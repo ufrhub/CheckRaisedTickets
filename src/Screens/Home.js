@@ -155,18 +155,17 @@ export default function Home() {
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
 
-        const isSameMonth = date.getMonth() === activeStartDate.getMonth()
+        const isSameMonth = date.getMonth() === activeStartDate.getMonth();
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
         const isToday = isSameDay(date, new Date());
         const isTicketDate = highlightDates.some(d => isSameDay(d, date));
         const isFuture = date > new Date();
 
-        if (!isSameMonth) return 'outside-month';
-        if (isTicketDate) return 'highlight';
-        if (isToday) return 'today-border';
-        if (isFuture && isWeekend) return 'future-weekend';
-        if (isWeekend) return 'weekend';
-        if (isFuture) return 'future-date';
+        if (!isSameMonth) return null;
+        if (isTicketDate) return "highlight";
+        if (isToday) return "today-border";
+        if (isWeekend) return "weekend";
+        if (isFuture) return "future-date";
 
         return null;
     };
@@ -223,7 +222,6 @@ export default function Home() {
                                 tileClassName={tileClassName}
                                 onClickDay={onDateClick}
                                 onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
-                            // maxDate={new Date()}
                             />
                         </div>
                     )

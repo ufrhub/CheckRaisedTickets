@@ -41,38 +41,37 @@
 
 /* ========== Calendar‑specific overrides ========== */
 
-/* 1. Any tile in a neighboring month → gray */
+/* Any tile in a neighboring month → gray */
 .react-calendar__month-view__days__day--neighboringMonth {
   color: gray !important;
 }
 
-/* 2. Any weekend (Sat/Sun) in the CURRENT month → black */
-.react-calendar__month-view__days__day--weekend:not(.react-calendar__month-view__days__day--neighboringMonth) {
+/* Weekend (Sat/Sun) in the CURRENT month → black */
+.weekend {
   color: black !important;
 }
 
-/* 3. Highlighted “ticket” dates */
+/* remove default active/focus visuals */
+.react-calendar__tile--active,
+.react-calendar__tile:focus {
+  background: none !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Highlighted “ticket” dates */
 .highlight {
   background-color: #007bff !important;
   border: 1px solid white !important;
   color: white !important;
 }
 
-/* 4. Today’s date border */
+/* Today’s date border */
 .today-border {
   border: 3px solid #007bff !important;
   background: none !important;
-  color: inherit !important;
-}
-
-/* 5. Future‑weekend style (if you still need a distinction) */
-.future-weekend {
-  color: #333 !important;
-}
-
-/* 6. Future‑date style */
-.future-date {
-  color: inherit
+  color: black !important;
 }
 
 /* Remove default active/focus visuals */
