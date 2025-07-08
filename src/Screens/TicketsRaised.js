@@ -138,23 +138,29 @@ const TicketsRaised = () => {
           <Loader />
         ) : (
           <div className="tickets-container">
-            <div className="dropdown-wrapper">
-              <Select
-                className="react-select-container"
-                styles={customStyles}
-                classNamePrefix="react-select"
-                isSearchable={false}
-                options={technicians.map(item => ({
-                  ...item,
-                  label: item.name,
-                  value: item.id
-                }))}
-                value={selectedTechnician}
-                onChange={(selected) => {
-                  setSelectedTechnician({ label: selected.name, value: selected.id });
-                }}
-              />
-            </div>
+            {
+              technicians && technicians.length > 1
+                ?
+                <div className="dropdown-wrapper">
+                  <Select
+                    className="react-select-container"
+                    styles={customStyles}
+                    classNamePrefix="react-select"
+                    isSearchable={false}
+                    options={technicians.map(item => ({
+                      ...item,
+                      label: item.name,
+                      value: item.id
+                    }))}
+                    value={selectedTechnician}
+                    onChange={(selected) => {
+                      setSelectedTechnician({ label: selected.name, value: selected.id });
+                    }}
+                  />
+                </div>
+                :
+                null
+            }
 
             <div className="tickets-header">
               <img
@@ -181,12 +187,12 @@ const TicketsRaised = () => {
                   <p><strong>Assigned To:</strong> {selectedTicket?.assignto}</p>
                   <p><strong>Status:</strong> {selectedTicket?.request_status}</p>
                   <p><strong>Date Requested:</strong> {formatDisplayDate(date)}</p>
-                  <p><strong>Category:</strong> {selectedTicket?.category}</p>
+                  <p><strong>Category:</strong> {selectedTicket?.type_of_request}</p>
                   <p><strong>Sub Category:</strong> {selectedTicket?.sub_category}</p>
                   <p><strong>Description:</strong> {selectedTicket?.description}</p>
                   <p><strong>Unit No:</strong> {selectedTicket?.unit}</p>
                   <p><strong>Resident Name:</strong> {selectedTicket?.name}</p>
-                  <p><strong>Resident Phone No:</strong> {selectedTicket?.phone}</p>
+                  <p><strong>Resident Phone No:</strong> _</p>
                   <div className="ticket-modal-footer">
                     <button onClick={() => setSelectedTicket(null)}>Close</button>
                   </div>
