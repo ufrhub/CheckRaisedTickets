@@ -36,7 +36,7 @@ const formatDisplayDate = (isoDateStr) => {
 };
 
 const TicketsRaised = () => {
-  const { id, date } = useParams();
+  const { id, isSupervisor, date } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { token, selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, technicians, setTechnicians } = useApiContext();
@@ -140,6 +140,7 @@ const TicketsRaised = () => {
           <div className="tickets-container">
             {
               technicians &&
+                isSupervisor &&
                 technicians.length > 1
                 ?
                 <div className="dropdown-wrapper">

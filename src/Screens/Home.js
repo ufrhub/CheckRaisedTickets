@@ -31,6 +31,7 @@ export default function Home() {
         token, setToken,
         dropdownData, setDropdownData,
         tickets, setTickets,
+        role, setRole,
         highlightDates, setHighlightDates,
         selectedOption, setSelectedOption,
     } = useApiContext();
@@ -130,11 +131,13 @@ export default function Home() {
                 });
                 // const response = await axios.get(url);
 
-                const result = response.data.result;
+                const result = response.data?.result;
+                const role = response.data?.role;
                 const dateKeys = Object.keys(result);
                 const dateObjects = dateKeys.map(date => new Date(date));
 
                 setTickets(result);
+                setRole(role)
                 setHighlightDates(dateObjects);
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);
@@ -146,7 +149,7 @@ export default function Home() {
         if (token.value !== null && ((tickets.length === 0 && highlightDates.length === 0) || selectedOption.value !== null)) {
             fetchData();
         }
-    }, [highlightDates.length, selectedOption.value, setHighlightDates, setTickets, tickets.length, token.value]);
+    }, [highlightDates.length, selectedOption.value, setHighlightDates, setTickets, setRole, tickets.length, token.value]);
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
@@ -167,10 +170,11 @@ export default function Home() {
     const onDateClick = (date) => {
         const formatted = format(date, 'yyyy-MM-dd');
         const hasTickets = highlightDates.some(d => isSameDay(d, date));
+        const isSupervisor = role === "maintenance-supervisor";
 
         if (hasTickets && tickets && tickets[formatted]) {
             const ticketDataForDay = tickets[formatted];
-            navigate(`/tickets/${selectedOption.value}/${formatted}`, {
+            navigate(`/tickets/${selectedOption.value}/${isSupervisor}/${formatted}`, {
                 state: {
                     ticketData: ticketDataForDay
                 }

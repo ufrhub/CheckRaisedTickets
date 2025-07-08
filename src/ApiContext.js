@@ -6,6 +6,7 @@ export const ApiProvider = ({ children }) => {
     const [token, setToken] = useState({ source: null, value: null });
     const [dropdownData, setDropdownData] = useState(null);
     const [tickets, setTickets] = useState([]);
+    const [role, setRole] = useState(null);
     const [highlightDates, setHighlightDates] = useState([]);
     const [selectedOption, setSelectedOption] = useState({ label: null, value: null });
     const [ticketDataForDay, setTicketDataForDay] = useState([]);
@@ -18,6 +19,7 @@ export const ApiProvider = ({ children }) => {
                 token, setToken,
                 dropdownData, setDropdownData,
                 tickets, setTickets,
+                role, setRole,
                 highlightDates, setHighlightDates,
                 selectedOption, setSelectedOption,
                 ticketDataForDay, setTicketDataForDay,
