@@ -193,7 +193,7 @@ const TicketsRaised = () => {
                   <p><strong>Description:</strong> {selectedTicket?.description}</p>
                   <p><strong>Unit No:</strong> {selectedTicket?.unit}</p>
                   <p><strong>Resident Name:</strong> {selectedTicket?.name}</p>
-                  <p><strong>Resident Phone No:</strong> _</p>
+                  <p><strong>Resident Phone No:</strong> {selectedTicket?.phone_number_1}</p>
                   <div className="ticket-modal-footer">
                     <button onClick={() => setSelectedTicket(null)}>Close</button>
                   </div>
