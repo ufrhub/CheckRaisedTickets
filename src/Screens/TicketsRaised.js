@@ -56,7 +56,8 @@ const TicketsRaised = () => {
         });
 
         const result = response.data.result;
-        setTechnicians(result.data);
+        // setTechnicians(result.data);
+        setTechnicians([{ name: "All", id: "All" }, ...result.data]);
       } catch (error) {
         console.error('Error fetching technicians data:', error);
       } finally {
@@ -78,16 +79,14 @@ const TicketsRaised = () => {
 
     const fetchData = async () => {
       setLoading(true);
-      // const url_with_token_required = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
-      const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${id}`;
+      const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${id}`;
 
       try {
-        // const response = await axios.get(url, {
-        //     headers: {
-        //         Authorization: `Bearer ${token.value}`
-        //     }
-        // });
-        const response = await axios.get(url);
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token.value}`
+          }
+        });
 
         const result = response.data.result;
         const dateKeys = Object.keys(result);
@@ -108,7 +107,7 @@ const TicketsRaised = () => {
     if (!ticketDataState || Object.keys(ticketDataState).length === 0) {
       fetchData();
     }
-  }, [date, id, location.state?.ticketsForDate, setTicketDataForDay, ticketDataForDay, tickets]);
+  }, [date, id, location.state?.ticketsForDate, setTicketDataForDay, ticketDataForDay, tickets, token.value]);
 
   const filteredTicketDataForDay = useMemo(() => {
     if (selectedTechnician.value === 'All') {
@@ -132,9 +131,6 @@ const TicketsRaised = () => {
 
     return filteredTickets;
   }, [ticketDataForDay, selectedTechnician.value]);
-
-  console.log("ticketDataForDay: ", ticketDataForDay);
-  console.log("filteredTicketDataForDay: ", filteredTicketDataForDay);
 
   return (
     <React.Fragment>
@@ -183,12 +179,15 @@ const TicketsRaised = () => {
             {selectedTicket && (
               <div className="ticket-modal" onClick={() => setSelectedTicket(null)}>
                 <div className="ticket-modal-content" onClick={(e) => e.stopPropagation()}>
-                  <h3>{selectedTicket.title}</h3>
-                  <p><strong>Technician:</strong> {selectedTicket.assignto}</p>
-                  <p><strong>Name:</strong> {selectedTicket.name}</p>
-                  <p><strong>Category:</strong> {selectedTicket.sub_category}</p>
-                  <p><strong>Eno:</strong> {selectedTicket.unit}</p>
-
+                  <p><strong>Assigned To:</strong> {selectedTicket?.assignto}</p>
+                  <p><strong>Status:</strong> {selectedTicket?.request_status}</p>
+                  <p><strong>Date Requested:</strong> {formatDisplayDate(date)}</p>
+                  <p><strong>Category:</strong> {selectedTicket?.category}</p>
+                  <p><strong>Sub Category:</strong> {selectedTicket?.sub_category}</p>
+                  <p><strong>Description:</strong> {selectedTicket?.description}</p>
+                  <p><strong>Unit No:</strong> {selectedTicket?.unit}</p>
+                  <p><strong>Resident Name:</strong> {selectedTicket?.name}</p>
+                  <p><strong>Resident Phone No:</strong> {selectedTicket?.phone}</p>
                   <div className="ticket-modal-footer">
                     <button onClick={() => setSelectedTicket(null)}>Close</button>
                   </div>
