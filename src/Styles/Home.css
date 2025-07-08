@@ -1,3 +1,4 @@
+/* Core container */
 .container {
   max-width: 900px;
   margin: auto;
@@ -5,6 +6,7 @@
   font-family: Arial, sans-serif;
 }
 
+/* Base react-calendar styling */
 .react-calendar {
   width: 100%;
   max-width: 100%;
@@ -14,6 +16,7 @@
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Navigation arrows and labels */
 .react-calendar__navigation__arrow {
   font-size: 1.5rem;
   padding: 0.5rem 1rem;
@@ -36,32 +39,43 @@
   border-radius: 4px;
 }
 
-/* .react-calendar__month-view__days__day--weekend:not(.react-calendar__month-view__days__day--neighboringMonth):not(.future-date) {
-  color: inherit;
-} */
+/* ========== Calendar‑specific overrides ========== */
 
-.react-calendar__month-view__days__day--weekend {
-  color: inherit !important;
+/* 1. Any tile in a neighboring month → gray */
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: gray !important;
 }
 
-.future-weekend {
-  color: #333 !important; /* or any color you like */
+/* 2. Any weekend (Sat/Sun) in the CURRENT month → black */
+.react-calendar__month-view__days__day--weekend:not(.react-calendar__month-view__days__day--neighboringMonth) {
+  color: black !important;
 }
 
+/* 3. Highlighted “ticket” dates */
 .highlight {
   background-color: #007bff !important;
   border: 1px solid white !important;
   color: white !important;
 }
 
-.ticket {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-top: 1rem;
-  padding: 1rem;
-  background: #f9f9f9;
+/* 4. Today’s date border */
+.today-border {
+  border: 3px solid #007bff !important;
+  background: none !important;
+  color: inherit !important;
 }
 
+/* 5. Future‑weekend style (if you still need a distinction) */
+.future-weekend {
+  color: #333 !important;
+}
+
+/* 6. Future‑date style */
+.future-date {
+  color: inherit
+}
+
+/* Remove default active/focus visuals */
 .react-calendar__tile--active {
   background: none !important;
   color: inherit !important;
@@ -75,13 +89,16 @@
   color: inherit !important;
 }
 
-.today-border {
-  border: 3px solid #007bff !important;
-  background: none !important;
-  color: inherit !important;
+/* Optional: wrapper for ticket list */
+.ticket {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9f9f9;
 }
 
-/* Responsive */
+/* Responsive tweaks */
 @media (max-width: 600px) {
   .react-calendar {
     padding: 0.3rem;

@@ -36,6 +36,7 @@ export default function Home() {
         selectedOption, setSelectedOption,
     } = useApiContext();
     const [loading, setLoading] = useState(true);
+    const [activeStartDate, setActiveStartDate] = useState(new Date())
 
     const setPropertiesReference = useRef(false);
     const navigate = useNavigate();
@@ -154,14 +155,17 @@ export default function Home() {
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
 
+        const isSameMonth = date.getMonth() === activeStartDate.getMonth()
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
         const isToday = isSameDay(date, new Date());
         const isTicketDate = highlightDates.some(d => isSameDay(d, date));
         const isFuture = date > new Date();
-        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
+        if (!isSameMonth) return 'outside-month';
         if (isTicketDate) return 'highlight';
         if (isToday) return 'today-border';
         if (isFuture && isWeekend) return 'future-weekend';
+        if (isWeekend) return 'weekend';
         if (isFuture) return 'future-date';
 
         return null;
@@ -218,6 +222,7 @@ export default function Home() {
                             <Calendar
                                 tileClassName={tileClassName}
                                 onClickDay={onDateClick}
+                                onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
                             // maxDate={new Date()}
                             />
                         </div>
