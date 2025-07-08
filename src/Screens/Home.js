@@ -188,7 +188,7 @@ export default function Home() {
                         <div className="container">
                             {
                                 dropdownData &&
-                                    dropdownData.length > 0
+                                    dropdownData.length > 1
                                     ?
                                     <div className="dropdown-wrapper">
                                         <Select

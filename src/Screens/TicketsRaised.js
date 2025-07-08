@@ -139,7 +139,8 @@ const TicketsRaised = () => {
         ) : (
           <div className="tickets-container">
             {
-              technicians && technicians.length > 1
+              technicians &&
+                technicians.length > 1
                 ?
                 <div className="dropdown-wrapper">
                   <Select
