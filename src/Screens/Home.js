@@ -170,11 +170,12 @@ export default function Home() {
     const onDateClick = (date) => {
         const formatted = format(date, 'yyyy-MM-dd');
         const hasTickets = highlightDates.some(d => isSameDay(d, date));
-        const isSupervisor = role === "maintenance-supervisor";
+        const isSupervisor = role === "maintenance-supervisor" ? "true" : "false";
+        console.log(isSupervisor);
 
         if (hasTickets && tickets && tickets[formatted]) {
             const ticketDataForDay = tickets[formatted];
-            navigate(`/tickets/${selectedOption.value}/${String(isSupervisor)}/${formatted}`, {
+            navigate(`/tickets/${selectedOption.value}/${isSupervisor}/${formatted}`, {
                 state: {
                     ticketData: ticketDataForDay
                 }
