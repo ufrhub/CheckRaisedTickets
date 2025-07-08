@@ -56,7 +56,6 @@ const TicketsRaised = () => {
         });
 
         const result = response.data.result;
-        // setTechnicians(result.data);
         setTechnicians([{ name: "All", id: "All" }, ...result.data]);
       } catch (error) {
         console.error('Error fetching technicians data:', error);
