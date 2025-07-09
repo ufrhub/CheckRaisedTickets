@@ -135,8 +135,22 @@ const TicketsRaised = () => {
     return phoneNumber.replace(/(?!^\+)[^\d]/g, '');
   }
 
+  const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+
   const handlePhoneClick = (phoneNumber) => {
-    window.location.href = `tel:${cleanPhoneNumber(phoneNumber)}`;
+    if (isMobile()) {
+      // On mobile: open dialer
+      window.location.href = `tel:${cleanPhoneNumber(phoneNumber)}`;
+    } else {
+      // On desktop: copy to clipboard
+      navigator.clipboard.writeText(phoneNumber)
+        .then(() => {
+          alert(`Phone number ${phoneNumber} copied to clipboard`);
+        })
+        .catch(err => {
+          console.error("Failed to copy!", err);
+        });
+    }
   };
 
   return (
@@ -204,36 +218,18 @@ const TicketsRaised = () => {
                   <p><strong>Resident Name:</strong> {selectedTicket?.name}</p>
                   <p>
                     <strong>Resident Phone No:</strong>{" "}
-                    <a href={`tel:${selectedTicket?.phone_number_1}`}>
+
+                    {/* <a href={`tel:${selectedTicket?.phone_number_1}`} target="_self">
                       📞 {selectedTicket?.phone_number_1}
-                    </a>
-                    {/* <button
-                      type="button"
-                      className="phone-link"
-                      onClick={() => handlePhoneClick(selectedTicket.phone_number_1)}
-                    >
-                      {selectedTicket?.phone_number_1}
-                    </button> */}
-                  </p>
-                  <p>
-                    <strong>Resident Phone No:</strong>{" "}
+                    </a> */}
+
                     <button
                       type="button"
                       className="phone-link"
                       onClick={() => handlePhoneClick(selectedTicket.phone_number_1)}
                     >
-                      {selectedTicket?.phone_number_1}
-                    </button>
-                  </p>
-                  <p>
-                    <strong>Resident Phone No:</strong>{" "}
-                    <a href={`tel:${cleanPhoneNumber(selectedTicket?.phone_number_1)}`}>
                       📞 {selectedTicket?.phone_number_1}
-                    </a>
-                  </p>
-                  <p>
-                    <strong>Resident Phone No:</strong>{" "}
-                    <a href="tel:+919876543210">📞 +91 9876543210</a>
+                    </button>
                   </p>
 
                   <div className="ticket-modal-footer">
