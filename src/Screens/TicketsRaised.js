@@ -131,23 +131,24 @@ const TicketsRaised = () => {
     return filteredTickets;
   }, [ticketDataForDay, selectedTechnician.value]);
 
-  // const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+  const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
 
-  // const handlePhoneClick = (phoneNumber) => {
-  //   if (isMobile()) {
-  //     // On mobile: open dialer
-  //     window.location.href = `tel:${phoneNumber}`;
-  //   } else {
-  //     // On desktop: copy to clipboard
-  //     navigator.clipboard.writeText(phoneNumber)
-  //       .then(() => {
-  //         alert(`Phone number ${phoneNumber} copied to clipboard`);
-  //       })
-  //       .catch(err => {
-  //         console.error("Failed to copy!", err);
-  //       });
-  //   }
-  // };
+  const handlePhoneClick = (phoneNumber) => {
+    if (isMobile()) {
+      // On mobile: open dialer
+      // window.location.href = `tel:${phoneNumber}`;
+      window.location.href = `tel://${phoneNumber}`;
+    } else {
+      // On desktop: copy to clipboard
+      navigator.clipboard.writeText(phoneNumber)
+        .then(() => {
+          alert(`Phone number ${phoneNumber} copied to clipboard`);
+        })
+        .catch(err => {
+          console.error("Failed to copy!", err);
+        });
+    }
+  };
 
   return (
     <React.Fragment>
@@ -214,14 +215,14 @@ const TicketsRaised = () => {
                   <p><strong>Resident Name:</strong> {selectedTicket?.name}</p>
                   <p>
                     <strong>Resident Phone No:</strong>{" "}
-                    <a href={`tel:${selectedTicket?.phone_number_1}`}>{selectedTicket?.phone_number_1}</a>
-                    {/* <button
+                    {/* <a href={`tel:${selectedTicket?.phone_number_1}`}>{selectedTicket?.phone_number_1}</a> */}
+                    <button
                       type="button"
                       className="phone-link"
                       onClick={() => handlePhoneClick(selectedTicket.phone_number_1)}
                     >
                       {selectedTicket?.phone_number_1}
-                    </button> */}
+                    </button>
                   </p>
 
                   <div className="ticket-modal-footer">
