@@ -133,11 +133,31 @@ const TicketsRaised = () => {
 
   const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
 
+  function cleanPhoneNumber(phoneNumber) {
+    return phoneNumber.replace(/[^\d+]/g, '');
+  }
+
   const handlePhoneClick = (phoneNumber) => {
     if (isMobile()) {
       // On mobile: open dialer
       // window.location.href = `tel:${phoneNumber}`;
-      window.location.href = `tel://${phoneNumber}`;
+      window.location.href = `tel:${cleanPhoneNumber(phoneNumber)}`;
+    } else {
+      // On desktop: copy to clipboard
+      navigator.clipboard.writeText(phoneNumber)
+        .then(() => {
+          alert(`Phone number ${phoneNumber} copied to clipboard`);
+        })
+        .catch(err => {
+          console.error("Failed to copy!", err);
+        });
+    }
+  };
+
+  const handlePhoneClick2 = (phoneNumber) => {
+    if (isMobile()) {
+      // On mobile: open dialer
+      window.location.href = `tel://${cleanPhoneNumber(phoneNumber)}`;
     } else {
       // On desktop: copy to clipboard
       navigator.clipboard.writeText(phoneNumber)
@@ -215,11 +235,28 @@ const TicketsRaised = () => {
                   <p><strong>Resident Name:</strong> {selectedTicket?.name}</p>
                   <p>
                     <strong>Resident Phone No:</strong>{" "}
-                    {/* <a href={`tel:${selectedTicket?.phone_number_1}`}>{selectedTicket?.phone_number_1}</a> */}
+                    <a href={`https://www.youtube.com/`}>Navigate to YouTube</a>
+                  </p>
+                  <p>
+                    <strong>Resident Phone No:</strong>{" "}
+                    <a href={`tel:${cleanPhoneNumber(selectedTicket?.phone_number_1)}`}>{selectedTicket?.phone_number_1}</a>
+                  </p>
+                  <p>
+                    <strong>Resident Phone No:</strong>{" "}
                     <button
                       type="button"
                       className="phone-link"
                       onClick={() => handlePhoneClick(selectedTicket.phone_number_1)}
+                    >
+                      {selectedTicket?.phone_number_1}
+                    </button>
+                  </p>
+                  <p>
+                    <strong>Resident Phone No:</strong>{" "}
+                    <button
+                      type="button"
+                      className="phone-link"
+                      onClick={() => handlePhoneClick2(selectedTicket.phone_number_1)}
                     >
                       {selectedTicket?.phone_number_1}
                     </button>
