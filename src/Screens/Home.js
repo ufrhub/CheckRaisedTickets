@@ -221,14 +221,6 @@ export default function Home() {
                                 onClickDay={onDateClick}
                                 onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
                             />
-
-                            {/* raw JSON dump */}
-                            <div style={{ padding: 12, marginTop: 12, background: '#f7f7f7', borderRadius: 8 }}>
-                                <strong>highlightDates (raw):</strong>
-                                <pre style={{ whiteSpace: 'pre-wrap' }}>
-                                    {JSON.stringify(highlightDates ?? [], null, 2)}
-                                </pre>
-                            </div>
                         </div>
                     )
             }
