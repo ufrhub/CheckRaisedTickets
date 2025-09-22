@@ -41,6 +41,9 @@ export default function Home() {
     const setPropertiesReference = useRef(false);
     const navigate = useNavigate();
 
+    // small helper: produce yyyy-MM-dd for a local Date
+    const getIso = (date) => format(date, 'yyyy-MM-dd');
+
     useEffect(() => {
         if (token.value === null && dropdownData === null) {
             const setPropertiesOnce = ({ mSource, mToken, mDropdownData }) => {
@@ -122,7 +125,6 @@ export default function Home() {
         const fetchData = async () => {
             setLoading(true);
             const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
-            // const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
                 const response = await axios.get(url, {
@@ -130,16 +132,16 @@ export default function Home() {
                         Authorization: `Bearer ${token.value}`
                     }
                 });
-                // const response = await axios.get(url);
 
-                const result = response.data?.result;
+                const result = response.data?.result || {};
                 const role = response.data?.role;
-                const dateKeys = Object.keys(result);
-                const dateObjects = dateKeys.map(date => new Date(date));
+
+                // Keep server date keys as strings (yyyy-MM-dd) to avoid timezone parsing issues.
+                const dateKeys = Object.keys(result); // e.g. ["2025-09-22", "2025-09-12"]
 
                 setTickets(result);
-                setRole(role)
-                setHighlightDates(dateObjects);
+                setRole(role);
+                setHighlightDates(dateKeys); // store strings (robust and timezone-agnostic)
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);
             } finally {
@@ -147,10 +149,27 @@ export default function Home() {
             }
         };
 
-        if (token.value !== null && ((tickets.length === 0 && highlightDates.length === 0) || selectedOption.value !== null)) {
+        if (token.value !== null && ((tickets.length === 0 && (highlightDates?.length || 0) === 0) || selectedOption.value !== null)) {
             fetchData();
         }
-    }, [highlightDates.length, selectedOption.value, setHighlightDates, setTickets, setRole, tickets.length, token.value]);
+    }, [selectedOption.value, setHighlightDates, setTickets, setRole, token.value]);
+
+    const isDateHighlighted = (date) => {
+        const iso = getIso(date); // tile local iso string
+        // 1) check tickets (preferred source)
+        if (tickets && tickets[iso]) return true;
+
+        // 2) fallback: highlightDates may be strings or Date objects; handle both
+        if (Array.isArray(highlightDates)) {
+            return highlightDates.some(d => {
+                if (!d) return false;
+                if (typeof d === 'string') return d === iso;
+                if (d instanceof Date) return isSameDay(d, date);
+                return false;
+            });
+        }
+        return false;
+    };
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
@@ -158,7 +177,7 @@ export default function Home() {
         const isSameMonth = date.getMonth() === activeStartDate.getMonth();
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
         const isToday = isSameDay(date, new Date());
-        const isTicketDate = highlightDates.some(d => isSameDay(d, date));
+        const isTicketDate = isDateHighlighted(date);
         const isFuture = date > new Date();
 
         if (!isSameMonth) return null;
@@ -171,11 +190,11 @@ export default function Home() {
     };
 
     const onDateClick = (date) => {
-        const formatted = format(date, 'yyyy-MM-dd');
-        const hasTickets = highlightDates.some(d => isSameDay(d, date));
+        const formatted = getIso(date); // local yyyy-MM-dd
+        const hasTickets = Boolean(tickets && tickets[formatted]);
         const isSupervisor = role === "maintenance-supervisor" ? "true" : "false";
 
-        if (hasTickets && tickets && tickets[formatted]) {
+        if (hasTickets) {
             const ticketDataForDay = tickets[formatted];
             navigate(`/tickets/${selectedOption.value}/${isSupervisor}/${formatted}`, {
                 state: {
