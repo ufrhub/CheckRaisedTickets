@@ -152,7 +152,6 @@ export default function Home() {
         const fetchData = async () => {
             setLoading(true);
             const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
-            // const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
                 const response = await axios.get(url, {
@@ -160,16 +159,16 @@ export default function Home() {
                         Authorization: `Bearer ${token.value}`
                     }
                 });
-                // const response = await axios.get(url);
 
-                const result = response.data?.result;
+                const result = response.data?.result || {};
                 const role = response.data?.role;
                 const dateKeys = Object.keys(result);
                 const dateObjects = dateKeys.map(dateString => toLocalMidnight(dateString));
+                console.log(dateObjects)
 
                 setTickets(result);
                 setRole(role)
-                setHighlightDates(dateObjects);
+                setHighlightDates(dateKeys);
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);
             } finally {
@@ -253,6 +252,14 @@ export default function Home() {
                                 onClickDay={onDateClick}
                                 onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
                             />
+
+                            {/* raw JSON dump */}
+                            <div style={{ padding: 12, marginTop: 12, background: '#f7f7f7', borderRadius: 8 }}>
+                                <strong>highlightDates (raw):</strong>
+                                <pre style={{ whiteSpace: 'pre-wrap' }}>
+                                    {JSON.stringify(highlightDates ?? [], null, 2)}
+                                </pre>
+                            </div>
                         </div>
                     )
             }

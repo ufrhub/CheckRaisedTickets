@@ -228,7 +228,7 @@ const TicketsRaised = () => {
                       className="phone-link"
                       onClick={() => handlePhoneClick(selectedTicket.phone_number_1)}
                     >
-                      📞 {selectedTicket?.phone_number_1}
+                      Call / Text
                     </button>
                   </p>
 
