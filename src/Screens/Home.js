@@ -26,36 +26,6 @@ const customStyles = {
     }),
 };
 
-// Helper function - handles YYYY-MM-DD, or full ISO like 2025-09-23T00:00:00Z
-const toLocalMidnight = (dateStr) => {
-    if (!dateStr) return null;
-
-    // 1) Plain YYYY-MM-DD -> explicit local midnight
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        const [y, m, d] = dateStr.split('-').map(Number);
-        return new Date(y, m - 1, d);
-    }
-
-    // 2) ISO with timezone info (Z or +hh:mm / -hh:mm) -> preserve server's UTC date
-    if (/T.*(Z|[+-]\d{2}:\d{2})$/.test(dateStr)) {
-        const parsed = new Date(dateStr);
-        if (!isNaN(parsed)) {
-            // use UTC fields so a "2025-09-23T00:00:00Z" remains 2025-09-23 for everyone
-            return new Date(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate());
-        }
-    }
-
-    // 3) Fallback: parse and normalize to local midnight
-    const parsed = new Date(dateStr);
-    if (!isNaN(parsed)) {
-        return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
-    }
-
-    // final fallback: try manual split
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return new Date(y, m - 1, d);
-};
-
 export default function Home() {
     const {
         token, setToken,
@@ -163,8 +133,6 @@ export default function Home() {
                 const result = response.data?.result || {};
                 const role = response.data?.role;
                 const dateKeys = Object.keys(result);
-                const dateObjects = dateKeys.map(dateString => toLocalMidnight(dateString));
-                console.log(dateObjects)
 
                 setTickets(result);
                 setRole(role)
@@ -187,7 +155,8 @@ export default function Home() {
         const isSameMonth = date.getMonth() === activeStartDate.getMonth();
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
         const isToday = isSameDay(date, new Date());
-        const isTicketDate = highlightDates.some(d => isSameDay(d, date));
+        const dayKey = format(date, 'yyyy-MM-dd');
+        const isTicketDate = (highlightDates || []).includes(dayKey);
         const isFuture = date > new Date();
 
         if (!isSameMonth) return null;
@@ -201,7 +170,7 @@ export default function Home() {
 
     const onDateClick = (date) => {
         const formatted = format(date, 'yyyy-MM-dd');
-        const hasTickets = highlightDates.some(d => isSameDay(d, date));
+        const hasTickets = (highlightDates || []).includes(formatted);
         const isSupervisor = role === "maintenance-supervisor" ? "true" : "false";
 
         if (hasTickets && tickets && tickets[formatted]) {
