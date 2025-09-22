@@ -152,7 +152,7 @@ export default function Home() {
         if (token.value !== null && ((tickets.length === 0 && (highlightDates?.length || 0) === 0) || selectedOption.value !== null)) {
             fetchData();
         }
-    }, [selectedOption.value, setHighlightDates, setTickets, setRole, token.value]);
+    }, [selectedOption.value, setHighlightDates, setTickets, setRole, token.value, tickets.length, highlightDates?.length]);
 
     const isDateHighlighted = (date) => {
         const iso = getIso(date); // tile local iso string
