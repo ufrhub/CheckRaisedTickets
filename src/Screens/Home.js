@@ -26,6 +26,36 @@ const customStyles = {
     }),
 };
 
+// Helper function - handles YYYY-MM-DD, or full ISO like 2025-09-23T00:00:00Z
+const toLocalMidnight = (dateStr) => {
+    if (!dateStr) return null;
+
+    // 1) Plain YYYY-MM-DD -> explicit local midnight
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+
+    // 2) ISO with timezone info (Z or +hh:mm / -hh:mm) -> preserve server's UTC date
+    if (/T.*(Z|[+-]\d{2}:\d{2})$/.test(dateStr)) {
+        const parsed = new Date(dateStr);
+        if (!isNaN(parsed)) {
+            // use UTC fields so a "2025-09-23T00:00:00Z" remains 2025-09-23 for everyone
+            return new Date(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate());
+        }
+    }
+
+    // 3) Fallback: parse and normalize to local midnight
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed)) {
+        return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+    }
+
+    // final fallback: try manual split
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+};
+
 export default function Home() {
     const {
         token, setToken,
@@ -40,9 +70,6 @@ export default function Home() {
 
     const setPropertiesReference = useRef(false);
     const navigate = useNavigate();
-
-    // small helper: produce yyyy-MM-dd for a local Date
-    const getIso = (date) => format(date, 'yyyy-MM-dd');
 
     useEffect(() => {
         if (token.value === null && dropdownData === null) {
@@ -125,6 +152,7 @@ export default function Home() {
         const fetchData = async () => {
             setLoading(true);
             const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
+            // const url = `https://app.propkey.app/api/auth/maintenance-request-supervisor-calendar/${selectedOption.value}`;
 
             try {
                 const response = await axios.get(url, {
@@ -132,16 +160,16 @@ export default function Home() {
                         Authorization: `Bearer ${token.value}`
                     }
                 });
+                // const response = await axios.get(url);
 
-                const result = response.data?.result || {};
+                const result = response.data?.result;
                 const role = response.data?.role;
-
-                // Keep server date keys as strings (yyyy-MM-dd) to avoid timezone parsing issues.
-                const dateKeys = Object.keys(result); // e.g. ["2025-09-22", "2025-09-12"]
+                const dateKeys = Object.keys(result);
+                const dateObjects = dateKeys.map(dateString => toLocalMidnight(dateString));
 
                 setTickets(result);
-                setRole(role);
-                setHighlightDates(dateKeys); // store strings (robust and timezone-agnostic)
+                setRole(role)
+                setHighlightDates(dateObjects);
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);
             } finally {
@@ -149,27 +177,10 @@ export default function Home() {
             }
         };
 
-        if (token.value !== null && ((tickets.length === 0 && (highlightDates?.length || 0) === 0) || selectedOption.value !== null)) {
+        if (token.value !== null && ((tickets.length === 0 && highlightDates.length === 0) || selectedOption.value !== null)) {
             fetchData();
         }
-    }, [selectedOption.value, setHighlightDates, setTickets, setRole, token.value, tickets.length, highlightDates?.length]);
-
-    const isDateHighlighted = (date) => {
-        const iso = getIso(date); // tile local iso string
-        // 1) check tickets (preferred source)
-        if (tickets && tickets[iso]) return true;
-
-        // 2) fallback: highlightDates may be strings or Date objects; handle both
-        if (Array.isArray(highlightDates)) {
-            return highlightDates.some(d => {
-                if (!d) return false;
-                if (typeof d === 'string') return d === iso;
-                if (d instanceof Date) return isSameDay(d, date);
-                return false;
-            });
-        }
-        return false;
-    };
+    }, [highlightDates.length, selectedOption.value, setHighlightDates, setTickets, setRole, tickets.length, token.value]);
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
@@ -177,7 +188,7 @@ export default function Home() {
         const isSameMonth = date.getMonth() === activeStartDate.getMonth();
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
         const isToday = isSameDay(date, new Date());
-        const isTicketDate = isDateHighlighted(date);
+        const isTicketDate = highlightDates.some(d => isSameDay(d, date));
         const isFuture = date > new Date();
 
         if (!isSameMonth) return null;
@@ -190,11 +201,11 @@ export default function Home() {
     };
 
     const onDateClick = (date) => {
-        const formatted = getIso(date); // local yyyy-MM-dd
-        const hasTickets = Boolean(tickets && tickets[formatted]);
+        const formatted = format(date, 'yyyy-MM-dd');
+        const hasTickets = highlightDates.some(d => isSameDay(d, date));
         const isSupervisor = role === "maintenance-supervisor" ? "true" : "false";
 
-        if (hasTickets) {
+        if (hasTickets && tickets && tickets[formatted]) {
             const ticketDataForDay = tickets[formatted];
             navigate(`/tickets/${selectedOption.value}/${isSupervisor}/${formatted}`, {
                 state: {
