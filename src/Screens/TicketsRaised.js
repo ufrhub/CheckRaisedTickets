@@ -26,13 +26,28 @@ const customStyles = {
 };
 
 const formatDisplayDate = (isoDateStr) => {
-  const [year, month, day] = isoDateStr.split("-");
-  const dateObj = new Date(`${year}-${month}-${day}`);
-  return dateObj.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  });
+  if (!isoDateStr) return '';
+
+  const dateOnly = isoDateStr.split('T')[0];
+  const parts = dateOnly.split('-');
+  if (parts.length < 3) return '';
+
+  const [year, month, day] = parts;
+  const monthIndex = parseInt(month, 10) - 1;
+  const dayNum = parseInt(day, 10);
+
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  if (
+    Number.isNaN(monthIndex) ||
+    monthIndex < 0 || monthIndex > 11 ||
+    Number.isNaN(dayNum)
+  ) return '';
+
+  return `${dayNum} ${monthNames[monthIndex]} ${year}`;
 };
 
 const TicketsRaised = () => {
@@ -219,16 +234,12 @@ const TicketsRaised = () => {
                   <p>
                     <strong>Resident Phone No:</strong>{" "}
 
-                    {/* <a href={`tel:${selectedTicket?.phone_number_1}`} target="_self">
-                      📞 {selectedTicket?.phone_number_1}
-                    </a> */}
-
                     <button
                       type="button"
                       className="phone-link"
                       onClick={() => handlePhoneClick(selectedTicket.phone_number_1)}
                     >
-                      Call / Text
+                      📞 {selectedTicket?.phone_number_1}
                     </button>
                   </p>
 
