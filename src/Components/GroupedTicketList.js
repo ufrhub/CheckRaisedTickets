@@ -33,7 +33,8 @@ const GroupedTicketList = ({ tickets, onSelect }) => {
                     <div key={slotKey} className="ticket-group">
                         <div className="ticket-item" onClick={() => toggleGroup(slotKey)}>
                             <div className="ticket-main" style={{ display: "flex", flex: 1, cursor: "pointer" }}>
-                                <div className="ticket-time-slot">{slotKey}</div>
+                                {/* <div className="ticket-time-slot">{slotKey}</div> */}
+                                <div className="ticket-time-slot">{groupTickets[0].time_formatted}</div>
                                 <div className="ticket-details">
                                     <div className="ticket-length">{groupTickets.length}</div>
                                 </div>
