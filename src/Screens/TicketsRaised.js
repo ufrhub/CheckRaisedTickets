@@ -226,6 +226,7 @@ const TicketsRaised = () => {
                   <p><strong>Assigned To:</strong> {selectedTicket?.assignto}</p>
                   <p><strong>Status:</strong> {selectedTicket?.request_status}</p>
                   <p><strong>Date Requested:</strong> {formatDisplayDate(date)}</p>
+                  <p><strong>Time Requested:</strong> {selectedTicket?.time_formatted}</p>
                   <p><strong>Category:</strong> {selectedTicket?.type_of_request}</p>
                   <p><strong>Sub Category:</strong> {selectedTicket?.sub_category}</p>
                   <p><strong>Description:</strong> {selectedTicket?.description}</p>
