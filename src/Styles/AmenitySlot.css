@@ -1,0 +1,149 @@
+/* Container adjustments */
+.slot-container {
+    padding: 20px 10px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header Styling */
+.slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.back-btn {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.back-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+}
+
+.header-text h2 {
+    margin: 0;
+    line-height: 1.2;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.slot-date {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.slot-info-badge {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Grid Layout */
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+/* Slot Card Styling */
+.slot-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white;
+    font-family: inherit;
+}
+
+.slot-time {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.slot-status {
+    font-size: 0.75rem;
+    text-transform: capitalize;
+}
+
+/* --- AVAILABLE STATE (Green) --- */
+.slot-card.available {
+    border-color: #c3e6cb;
+    background-color: #fff;
+    color: #155724;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.slot-card.available:hover {
+    background-color: #d4edda;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slot-card.available .status-text.success {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* --- UNAVAILABLE STATE (Red) --- */
+.slot-card.unavailable {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.slot-card.unavailable .slot-time {
+    opacity: 0.7;
+    text-decoration: line-through;
+}
+
+.slot-card.unavailable .status-text.error {
+    font-size: 0.7rem;
+    display: block;
+    line-height: 1.1;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 480px) {
+    .slot-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .slot-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

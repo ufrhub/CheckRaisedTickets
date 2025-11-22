@@ -4,6 +4,8 @@ const ApiContext = createContext();
 
 export const ApiProvider = ({ children }) => {
     const [token, setToken] = useState({ source: null, value: null });
+    const [amenityID, setAmenityID] = useState({ source: null, value: null });
+    const [amenityData, setAmenityData] = useState([]);
     const [dropdownData, setDropdownData] = useState(null);
     const [tickets, setTickets] = useState([]);
     const [role, setRole] = useState(null);
@@ -17,6 +19,8 @@ export const ApiProvider = ({ children }) => {
         <ApiContext.Provider
             value={{
                 token, setToken,
+                amenityID, setAmenityID, 
+                amenityData, setAmenityData,
                 dropdownData, setDropdownData,
                 tickets, setTickets,
                 role, setRole,

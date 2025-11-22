@@ -1,0 +1,86 @@
+/* Core container */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 1px;
+    font-family: Arial, sans-serif;
+}
+
+/* Base react-calendar styling */
+.react-calendar {
+    width: 100%;
+    max-width: 100%;
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation arrows and labels */
+.react-calendar__navigation__arrow {
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+}
+
+.react-calendar__navigation__label {
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+}
+
+.react-calendar__navigation button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.react-calendar__navigation button:hover {
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+/* ========== Calendar‑specific overrides ========== */
+
+/* Library's native weekend class */
+.react-calendar__month-view__days__day--weekend {
+    color: #000000;
+    text-decoration: none;
+}
+
+/* Disabled / Past dates (overrides weekend color due to !important) */
+.react-calendar__tile:disabled,
+.react-calendar__tile--disabled {
+    background-color: #f0f0f0 !important;
+    color: #ababab !important; /* Gray text */
+    cursor: not-allowed !important;
+}
+
+/* Neighboring month dates */
+.react-calendar__month-view__days__day--neighboringMonth {
+    color: #ccc !important;
+}
+
+/* Remove default active/focus visuals */
+.react-calendar__tile--active,
+.react-calendar__tile:focus,
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+    background: none;
+    box-shadow: none;
+    outline: none;
+}
+
+/* Today’s date border */
+.today-border {
+    border: 3px solid #007bff !important;
+    background: transparent !important;
+    color: black !important;
+    border-radius: 4px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+    .react-calendar {
+        padding: 0.3rem;
+    }
+}
