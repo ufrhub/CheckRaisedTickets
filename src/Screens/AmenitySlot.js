@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '../Styles/AmenitySlot.css';
 import { useApiContext } from '../ApiContext';
 import axios from "axios";
@@ -7,6 +7,8 @@ import Loader from '../Components/Loader';
 
 export const AmenitySlot = () => {
   const { token, amenityID, date } = useParams();
+  const location = useLocation();
+  const showBackButton = location.state?.showBackButton;
   const { amenityData, setAmenityData } = useApiContext();
   const [loading, setLoading] = useState(true);
 
@@ -57,9 +59,14 @@ export const AmenitySlot = () => {
             {/* Header Section */}
             <header className="slot-header">
               <div className="header-left">
-                <button className="back-btn" onClick={() => navigate(-1)}>
-                  &#8592; Back
-                </button>
+                {
+                  showBackButton ?
+                    <button className="back-btn" onClick={() => navigate(-1)}>
+                      &#8592; Back
+                    </button>
+                    :
+                    null
+                }
 
                 <div className="header-text">
                   <h2>{amenityData?.amenity_name}</h2>

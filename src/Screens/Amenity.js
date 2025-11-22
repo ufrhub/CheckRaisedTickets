@@ -11,6 +11,7 @@ export const Amenity = () => {
     const {
         token, setToken,
         amenityID, setAmenityID,
+        showBackButton, setShowBackButton,
     } = useApiContext();
     const [loading, setLoading] = useState(() => {
         if (!token || !amenityID) {
@@ -25,14 +26,18 @@ export const Amenity = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (token.value === null && amenityID.value === null) {
-            const setPropertiesOnce = ({ mSource, mToken, mAmenityID }) => {
+        if (token.value === null && amenityID.value === null && showBackButton.value === null) {
+            const setPropertiesOnce = ({ mSource, mToken, mAmenityID, mShowBackButton }) => {
                 if (!setPropertiesReference.current) {
                     setPropertiesReference.current = true;
                     if (mToken && mAmenityID) {
                         setToken({ source: mSource, value: mToken });
                         setAmenityID({ source: mSource, value: mAmenityID });
                         setLoading(false);
+                    }
+
+                    if (mShowBackButton) {
+                        setShowBackButton({ source: mSource, value: mShowBackButton });
                     }
 
                 } else {
@@ -49,8 +54,9 @@ export const Amenity = () => {
                         const parsedData = JSON.parse(decoded);
                         const apiToken = parsedData.apiToken;
                         const amenityData = parsedData.amenity_id;
+                        const isBackButtonVisible = parsedData.showBackButton;
 
-                        setPropertiesOnce({ mSource: "URL", mToken: apiToken, mAmenityID: amenityData });
+                        setPropertiesOnce({ mSource: "URL", mToken: apiToken, mAmenityID: amenityData, mShowBackButton: isBackButtonVisible });
                     }
                 } catch (error) {
                     console.warn("Ignoring non-JSON postMessage:", params.data);
@@ -66,8 +72,9 @@ export const Amenity = () => {
                         const parsedData = JSON.parse(message.data);
                         const apiToken = parsedData.apiToken;
                         const amenityData = parsedData.amenity_id;
+                        const isBackButtonVisible = parsedData.showBackButton;
 
-                        setPropertiesOnce({ mSource: "postMessage", mToken: apiToken, mAmenityID: amenityData });
+                        setPropertiesOnce({ mSource: "postMessage", mToken: apiToken, mAmenityID: amenityData, mShowBackButton: isBackButtonVisible });
                     }
                 } catch (error) {
                     console.warn("Ignoring non-JSON postMessage:", message);
@@ -81,8 +88,9 @@ export const Amenity = () => {
                         const parsedData = JSON.parse(receivedData.data);
                         const apiToken = parsedData.apiToken;
                         const amenityData = parsedData.amenity_id;
+                        const isBackButtonVisible = parsedData.showBackButton;
 
-                        setPropertiesOnce({ mSource: "window.setToken", mToken: apiToken, mAmenityID: amenityData });
+                        setPropertiesOnce({ mSource: "window.setToken", mToken: apiToken, mAmenityID: amenityData, mShowBackButton: isBackButtonVisible });
                     }
                 } catch (error) {
                     console.warn("Ignoring non-JSON postMessage:", receivedData.data);
@@ -94,7 +102,7 @@ export const Amenity = () => {
                 delete window.setToken;
             };
         }
-    }, [amenityID, setAmenityID, setToken, token.value]);
+    }, [amenityID, setAmenityID, setShowBackButton, setToken, showBackButton.value, token.value]);
 
     const tileClassName = ({ date, view }) => {
         if (view !== "month") return null;
@@ -113,7 +121,11 @@ export const Amenity = () => {
     const onDateClick = (date) => {
         const formatted = format(date, 'yyyy-MM-dd');
 
-        navigate(`/amenityslot/${token.value}/${amenityID.value}/${formatted}`);
+        navigate(`/amenityslot/${token.value}/${amenityID.value}/${formatted}`, {
+            state: {
+                showBackButton: showBackButton.value
+            }
+        });
     };
 
     return (
