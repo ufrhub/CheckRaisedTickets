@@ -58,26 +58,25 @@ export const AmenitySlot = () => {
           <div className="container slot-container">
             {/* Header Section */}
             <header className="slot-header">
-              <div className="header-left">
-                {
-                  showBackButton ?
-                    <button className="back-btn" onClick={() => navigate(-1)}>
-                      &#8592; Back
-                    </button>
-                    :
-                    null
-                }
-
-                <div className="header-text">
-                  <h2>{amenityData?.amenity_name}</h2>
-                  <p className="slot-date">
-                    Selected Date: <strong>{date || amenityData?.date}</strong>
-                  </p>
-                </div>
+              <div className="header-section start">
+                {showBackButton && (
+                  <button className="back-btn" onClick={() => navigate(-1)}>
+                    &#8592; Back
+                  </button>
+                )}
               </div>
 
-              <div className="slot-info-badge">
-                <span>Max Duration: {amenityData?.max_duration_formatted}</span>
+              <div className="header-section center">
+                <h2>{amenityData?.amenity_name}</h2>
+                <p className="slot-date">
+                  Selected Date: <strong>{date || amenityData?.date}</strong>
+                </p>
+              </div>
+
+              <div className="header-section end">
+                <div className="slot-info-badge">
+                  <span>Max Duration: {amenityData?.max_duration_formatted}</span>
+                </div>
               </div>
             </header>
 
