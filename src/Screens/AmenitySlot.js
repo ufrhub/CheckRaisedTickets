@@ -40,8 +40,18 @@ export const AmenitySlot = () => {
     }
   }, [amenityID, date, setAmenityData, token]);
 
-  // Helper to cut off seconds (05:00:00 -> 05:00)
-  const formatTime = (timeStr) => timeStr.slice(0, 5);
+  // Helper to format time
+  const formatTime = (timeString) => {
+    const [hours, minutes] = timeString.split(':');
+    let h = parseInt(hours, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+
+    // Convert 24h to 12h format
+    h = h % 12;
+    h = h ? h : 12; // the hour '0' should be '12'
+
+    return `${h}:${minutes} ${ampm}`;
+  };
 
   // Helper to clean up the reason text
   const formatReason = (reason) => {
@@ -89,7 +99,7 @@ export const AmenitySlot = () => {
                   disabled={!slot.available}
                 >
                   <div className="slot-time">
-                    {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
+                    {formatTime(slot.start_time)}
                   </div>
                   <div className="slot-status">
                     {slot.available ? (
