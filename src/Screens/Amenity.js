@@ -142,18 +142,6 @@ export const Amenity = () => {
                                 onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
                                 minDate={minSelectableDate}
                             />
-
-                            <div style={{ marginTop: '20px', padding: '10px', borderTop: '1px solid #eee' }}>
-                                <p style={{ margin: '5px 0', wordBreak: 'break-all' }}>
-                                    <strong>Token:</strong> {token?.value}
-                                </p>
-                                <p style={{ margin: '5px 0' }}>
-                                    <strong>Amenity ID:</strong> {amenityID?.value}
-                                </p>
-                                <p style={{ margin: '5px 0' }}>
-                                    <strong>Source:</strong> {token?.source || amenityID?.source}
-                                </p>
-                            </div>
                         </div>
                     )
             }

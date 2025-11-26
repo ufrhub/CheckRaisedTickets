@@ -9,10 +9,35 @@ export const AmenitySlot = () => {
   const { token, amenityID, date } = useParams();
   const location = useLocation();
   const showBackButton = location.state?.showBackButton;
-  const { amenityData, setAmenityData } = useApiContext();
+  const { amenityData, setAmenityData, filteredAmenitySlot, setFilteredAmenitySlot } = useApiContext();
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
+
+  const filterUpcomingSlots = (slots, manualDate) => {
+    const now = new Date();
+    const pad = (num) => String(num).padStart(2, '0');
+
+    const currentDateTimeStr =
+      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+    return slots.filter((slot) => {
+      let datePart = "";
+
+      if (manualDate) {
+        datePart = manualDate;
+      } else if (slot.potential_end_datetime) {
+        datePart = slot.potential_end_datetime.split(' ')[0];
+      } else {
+        return false;
+      }
+
+      const slotDateTimeStr = `${datePart} ${slot.start_time}`;
+
+      return slotDateTimeStr > currentDateTimeStr;
+    });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +52,9 @@ export const AmenitySlot = () => {
         });
 
         const result = response.data.data;
+        const upcomingSlots = filterUpcomingSlots(result.slots, result.date);
         setAmenityData(result);
+        setFilteredAmenitySlot(upcomingSlots);
       } catch (error) {
         console.error('Error fetching technicians data:', error);
       } finally {
@@ -38,7 +65,7 @@ export const AmenitySlot = () => {
     if (token && amenityID && date) {
       fetchData();
     }
-  }, [amenityID, date, setAmenityData, token]);
+  }, [amenityID, date, setAmenityData, setFilteredAmenitySlot, token]);
 
   // Helper to format time
   const formatTime = (timeString) => {
@@ -92,7 +119,7 @@ export const AmenitySlot = () => {
 
             {/* Grid Section */}
             <div className="slot-grid">
-              {amenityData?.slots?.map((slot, index) => (
+              {filteredAmenitySlot?.map((slot, index) => (
                 <button
                   key={index}
                   className={`slot-card ${slot.available ? 'available' : 'unavailable'}`}
