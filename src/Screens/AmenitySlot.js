@@ -14,30 +14,38 @@ export const AmenitySlot = () => {
 
   const navigate = useNavigate();
 
-  const filterUpcomingSlots = (slots, manualDate) => {
-    const now = new Date();
-    const pad = (num) => String(num).padStart(2, '0');
+  /** 
+    // Filter out the passed slots according to the time
+    const filterUpcomingSlots = (slots, manualDate) => {
+      const now = new Date();
+      const pad = (num) => String(num).padStart(2, '0');
+  
+      const currentDateTimeStr =
+        `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+        `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  
+      return slots.filter((slot) => {
+        let datePart = "";
+  
+        if (manualDate) {
+          datePart = manualDate;
+        } else if (slot.potential_end_datetime) {
+          datePart = slot.potential_end_datetime.split(' ')[0];
+        } else {
+          return false;
+        }
+  
+        const slotDateTimeStr = `${datePart} ${slot.start_time}`;
+  
+        return slotDateTimeStr > currentDateTimeStr;
+      });
+    };
+  **/
 
-    const currentDateTimeStr =
-      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
-      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
-    return slots.filter((slot) => {
-      let datePart = "";
-
-      if (manualDate) {
-        datePart = manualDate;
-      } else if (slot.potential_end_datetime) {
-        datePart = slot.potential_end_datetime.split(' ')[0];
-      } else {
-        return false;
-      }
-
-      const slotDateTimeStr = `${datePart} ${slot.start_time}`;
-
-      return slotDateTimeStr > currentDateTimeStr;
-    });
-  };
+  // Filter out the passed slots according to the reason `Past Time`
+  const filterUpcomingSlots = (slots) => {
+    return slots.filter((slot) => slot.reason !== "Past Time");;
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +60,8 @@ export const AmenitySlot = () => {
         });
 
         const result = response.data.data;
-        const upcomingSlots = filterUpcomingSlots(result.slots, result.date);
+        // const upcomingSlots = filterUpcomingSlots(result.slots, result.date);
+        const upcomingSlots = filterUpcomingSlots(result.slots);
         setAmenityData(result);
         setFilteredAmenitySlot(upcomingSlots);
       } catch (error) {
@@ -66,6 +75,11 @@ export const AmenitySlot = () => {
       fetchData();
     }
   }, [amenityID, date, setAmenityData, setFilteredAmenitySlot, token]);
+
+  const formatDate = (dateString) => {
+    const [year, month, day] = dateString.split("-");
+    return `${month}-${day}-${year}`;
+  }
 
   // Helper to format time
   const formatTime = (timeString) => {
@@ -106,7 +120,7 @@ export const AmenitySlot = () => {
               <div className="header-section center">
                 <h2>{amenityData?.amenity_name}</h2>
                 <p className="slot-date">
-                  Selected Date: <strong>{date || amenityData?.date}</strong>
+                  Selected Date: <strong>{formatDate(date) || formatDate(amenityData?.date)}</strong>
                 </p>
               </div>
 
