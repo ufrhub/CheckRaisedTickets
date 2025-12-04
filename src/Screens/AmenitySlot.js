@@ -44,7 +44,7 @@ export const AmenitySlot = () => {
 
   // Filter out the passed slots according to the reason `Past Time`
   const filterUpcomingSlots = (slots) => {
-    return slots.filter((slot) => slot.reason !== "Past Time");;
+    return slots.filter((slot) => slot.reason !== "past_time");
   }
 
   useEffect(() => {
