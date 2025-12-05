@@ -1,5 +1,5 @@
 /* Container adjustments */
-.slot-container {
+.amenity-slot {
     padding: 20px 10px;
     max-width: 900px;
     margin: 0 auto;
@@ -73,7 +73,7 @@
     white-space: nowrap;
 }
 
-.slot-grid {
+.slot-container-section {
     display: flex;
     flex-direction: column;
     gap: 12px;

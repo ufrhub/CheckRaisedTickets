@@ -106,7 +106,7 @@ export const AmenitySlot = () => {
         loading ? (
           <Loader />
         ) : (
-          <div className="container slot-container">
+          <div className="amenity-slot container">
             {/* Header Section */}
             <header className="slot-header">
               <div className="header-section start">
@@ -131,8 +131,8 @@ export const AmenitySlot = () => {
               </div>
             </header>
 
-            {/* Grid Section */}
-            <div className="slot-grid">
+            {/* Slot Container Section */}
+            <div className="slot-container-section">
               {
                 filteredAmenitySlot &&
                   filteredAmenitySlot.length > 0
