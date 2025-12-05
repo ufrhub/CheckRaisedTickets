@@ -97,7 +97,7 @@ export const AmenitySlot = () => {
   // Helper to clean up the reason text
   const formatReason = (reason) => {
     if (!reason) return "";
-    return reason.replace(/_/g, " ").replace("would ", "");
+    return reason.replace(/_/g, " ");
   };
 
   return (
@@ -133,26 +133,33 @@ export const AmenitySlot = () => {
 
             {/* Grid Section */}
             <div className="slot-grid">
-              {filteredAmenitySlot?.map((slot, index) => (
-                <button
-                  key={index}
-                  className={`slot-card ${slot.available ? 'available' : 'unavailable'}`}
-                  disabled={!slot.available}
-                >
-                  <div className="slot-time">
-                    {formatTime(slot.start_time)}
-                  </div>
-                  <div className="slot-status">
-                    {slot.available ? (
-                      <span className="status-text success">Available</span>
-                    ) : (
-                      <span className="status-text error">
-                        {formatReason(slot.reason)}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              ))}
+              {
+                filteredAmenitySlot &&
+                  filteredAmenitySlot.length > 0
+                  ?
+                  filteredAmenitySlot?.map((slot, index) => (
+                    <button
+                      key={index}
+                      className={`slot-card ${slot.available ? 'available' : 'unavailable'}`}
+                      disabled={!slot.available}
+                    >
+                      <div className="slot-time">
+                        {formatTime(slot.start_time)}
+                      </div>
+                      <div className="slot-status">
+                        {slot.available ? (
+                          <span className="status-text success">Available</span>
+                        ) : (
+                          <span className="status-text error">
+                            {formatReason(slot.reason)}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))
+                  :
+                  <div>No Slots Available</div>
+              }
             </div>
           </div>
         )
