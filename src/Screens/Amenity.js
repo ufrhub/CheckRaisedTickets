@@ -143,7 +143,7 @@ export const Amenity = () => {
                                 minDate={minSelectableDate}
                             />
 
-                            <div style={{ margin: "30px 0" }}>
+                            <div style={{ margin: "30px 0", display: "grid", placeItems: "center", wordBreak: "break-all" }}>
                                 Token: {token.value}
                             </div>
                             <div style={{ margin: "40px 0" }}>
