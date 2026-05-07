@@ -11,7 +11,6 @@ export const AmenitySlot = () => {
   const showBackButton = location.state?.showBackButton;
   const { amenityData, setAmenityData, filteredAmenitySlot, setFilteredAmenitySlot } = useApiContext();
   const [loading, setLoading] = useState(true);
-  const [finalURL, setFinalURL] = useState();
 
   const navigate = useNavigate();
 
@@ -52,7 +51,6 @@ export const AmenitySlot = () => {
     const fetchData = async () => {
       setLoading(true);
       const url = `https://app.propkey.app/public/api/auth/get-amenity-time-slots?property_amenity_id=${amenityID}&date=${date}`;
-      setFinalURL(url);
 
       try {
         const response = await axios.get(url, {
