@@ -164,11 +164,8 @@ export const AmenitySlot = () => {
               }
             </div>
 
-            <div style={{ margin: "30px 0" }}>
-              URL: {finalURL}
-            </div>
-            <div style={{ margin: "40px 0" }}>
-              Response: {JSON.stringify(amenityData)}
+            <div style={{ textAlign: "center", margin: "30px 0" }}>
+              All Slots Loaded.
             </div>
           </div>
         )
