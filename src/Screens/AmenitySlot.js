@@ -11,6 +11,7 @@ export const AmenitySlot = () => {
   const showBackButton = location.state?.showBackButton;
   const { amenityData, setAmenityData, filteredAmenitySlot, setFilteredAmenitySlot } = useApiContext();
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const navigate = useNavigate();
 
@@ -50,6 +51,7 @@ export const AmenitySlot = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setErrorMessage(null);
       const url = `https://app.propkey.app/public/api/auth/get-amenity-time-slots?property_amenity_id=${amenityID}&date=${date}`;
 
       try {
@@ -66,6 +68,11 @@ export const AmenitySlot = () => {
         setFilteredAmenitySlot(upcomingSlots);
       } catch (error) {
         console.error('Error fetching technicians data:', error);
+        // Clear any slots left over from a previous successful load
+        setAmenityData([]);
+        setFilteredAmenitySlot([]);
+        // Show the API's own message (e.g. "Your session expired, Please login again")
+        setErrorMessage(error?.response?.data?.message || 'Something went wrong while loading the slots. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -134,7 +141,11 @@ export const AmenitySlot = () => {
             {/* Slot Container Section */}
             <div className="slot-container-section">
               {
-                filteredAmenitySlot &&
+                errorMessage
+                  ?
+                  <div className="slot-error-message">{errorMessage}</div>
+                  :
+                  filteredAmenitySlot &&
                   filteredAmenitySlot.length > 0
                   ?
                   filteredAmenitySlot?.map((slot, index) => (
@@ -162,9 +173,11 @@ export const AmenitySlot = () => {
               }
             </div>
 
-            <div style={{ textAlign: "center", margin: "30px 0" }}>
-              All Slots Loaded.
-            </div>
+            {!errorMessage && (
+              <div style={{ textAlign: "center", margin: "30px 0" }}>
+                All Slots Loaded.
+              </div>
+            )}
           </div>
         )
       }
