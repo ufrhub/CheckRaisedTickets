@@ -36,6 +36,7 @@ export default function Home() {
         selectedOption, setSelectedOption,
     } = useApiContext();
     const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
     const [activeStartDate, setActiveStartDate] = useState(new Date())
 
     const setPropertiesReference = useRef(false);
@@ -121,6 +122,7 @@ export default function Home() {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
+            setErrorMessage(null);
             const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${selectedOption.value}`;
 
             try {
@@ -139,6 +141,8 @@ export default function Home() {
                 setHighlightDates(dateKeys);
             } catch (error) {
                 console.error('Error fetching maintenance data:', error);
+                // Show the API's own message (e.g. "Your session expired, Please login again")
+                setErrorMessage(error?.response?.data?.message || 'Something went wrong while loading the tickets. Please try again.');
             } finally {
                 setLoading(false);
             }
@@ -216,11 +220,17 @@ export default function Home() {
                                     <></>
                             }
 
-                            <Calendar
-                                tileClassName={tileClassName}
-                                onClickDay={onDateClick}
-                                onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
-                            />
+                            {
+                                errorMessage
+                                    ?
+                                    <div className="api-error-message">{errorMessage}</div>
+                                    :
+                                    <Calendar
+                                        tileClassName={tileClassName}
+                                        onClickDay={onDateClick}
+                                        onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
+                                    />
+                            }
                         </div>
                     )
             }

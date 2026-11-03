@@ -57,10 +57,14 @@ const TicketsRaised = () => {
   const { token, selectedTicket, setSelectedTicket, tickets, ticketDataForDay, setTicketDataForDay, technicians, setTechnicians } = useApiContext();
   const [selectedTechnician, setSelectedTechnician] = useState({ value: "All", label: "All" });
   const [loading, setLoading] = useState(true);
+  const [technicianError, setTechnicianError] = useState(null);
+  const [ticketsError, setTicketsError] = useState(null);
+  const errorMessage = technicianError || ticketsError;
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setTechnicianError(null);
       const url = `https://app.propkey.app/public/api/auth/get-property-technician/${id}`;
 
       try {
@@ -74,6 +78,8 @@ const TicketsRaised = () => {
         setTechnicians([{ name: "All", id: "All" }, ...result.data]);
       } catch (error) {
         console.error('Error fetching technicians data:', error);
+        // Show the API's own message (e.g. "Your session expired, Please login again")
+        setTechnicianError(error?.response?.data?.message || 'Something went wrong while loading the technicians. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -93,6 +99,7 @@ const TicketsRaised = () => {
 
     const fetchData = async () => {
       setLoading(true);
+      setTicketsError(null);
       const url = `https://app.propkey.app/public/api/auth/maintenance-request-supervisor-calendar-val/${id}`;
 
       try {
@@ -113,6 +120,8 @@ const TicketsRaised = () => {
         }
       } catch (error) {
         console.error('Error fetching data:', error);
+        // Show the API's own message (e.g. "Your session expired, Please login again")
+        setTicketsError(error?.response?.data?.message || 'Something went wrong while loading the tickets. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -211,7 +220,9 @@ const TicketsRaised = () => {
               <h2>{formatDisplayDate(date)}</h2>
             </div>
 
-            {filteredTicketDataForDay.length === 0 ? (
+            {errorMessage ? (
+              <div className="api-error-message">{errorMessage}</div>
+            ) : filteredTicketDataForDay.length === 0 ? (
               <p className="no-tickets">No tickets found for this date.</p>
             ) : (
               <GroupedTicketList
