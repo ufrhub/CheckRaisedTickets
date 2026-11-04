@@ -92,6 +92,85 @@
     background: transparent;
 }
 
+/* Availability colours from get-amenity-date-availability.
+   Extra-specific so they win over the global active/focus/today resets. */
+.react-calendar .react-calendar__month-view__days .react-calendar__tile.react-calendar__month-view__days__day.date-available {
+    background: #dbeafe !important; /* light blue */
+    color: #1e40af !important;
+}
+.react-calendar .react-calendar__month-view__days .react-calendar__tile.react-calendar__month-view__days__day.date-available:enabled:hover {
+    background: #bfdbfe !important;
+}
+
+.react-calendar .react-calendar__month-view__days .react-calendar__tile.react-calendar__month-view__days__day.date-unavailable {
+    background: #ffedd5 !important; /* light orange */
+    color: #9a3412 !important;
+}
+.react-calendar .react-calendar__month-view__days .react-calendar__tile.react-calendar__month-view__days__day.date-unavailable:enabled:hover {
+    background: #fed7aa !important;
+}
+
+/* White border so each coloured date looks like a separate block.
+   Today is excluded so it keeps its green border. */
+.react-calendar .react-calendar__month-view__days .react-calendar__tile.react-calendar__month-view__days__day.date-available:not(.today-border),
+.react-calendar .react-calendar__month-view__days .react-calendar__tile.react-calendar__month-view__days__day.date-unavailable:not(.today-border) {
+    border: 2px solid white !important;
+    border-radius: 6px;
+}
+
+/* Popup shown when an unavailable date is clicked */
+.availability-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.availability-modal-content {
+    box-sizing: border-box;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    max-width: 90%;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.availability-modal-content h3 {
+    margin-top: 0;
+    color: #9a3412;
+}
+
+.availability-modal-content p {
+    margin-top: 0;
+}
+
+.availability-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+}
+
+.availability-modal-footer button {
+    padding: 0.5rem 1rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.availability-modal-footer button:hover {
+    background-color: #555;
+}
+
 /* Responsive tweaks */
 @media (max-width: 600px) {
     .react-calendar {
