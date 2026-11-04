@@ -163,9 +163,9 @@ export default function Home() {
         const isTicketDate = (highlightDates || []).includes(dayKey);
         const isFuture = date > new Date();
 
-        if (!isSameMonth) return null;
+        if (!isSameMonth) return isToday ? "today-border" : null;
+        if (isToday) return isTicketDate ? "highlight today-border" : "today-border";
         if (isTicketDate) return "highlight";
-        if (isToday) return "today-border";
         if (isWeekend) return "weekend";
         if (isFuture) return "future-date";
 

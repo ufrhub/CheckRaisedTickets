@@ -43,7 +43,7 @@
 
 /* Any tile in a neighboring month → gray */
 .react-calendar__month-view__days__day--neighboringMonth {
-  color: gray !important;
+  color: #ccc !important;
 }
 
 /* Weekend (Sat/Sun) in the CURRENT month → black */
@@ -67,11 +67,26 @@
   color: white !important;
 }
 
-/* Today’s date border */
-.today-border {
-  border: 3px solid #007bff !important;
-  background: none !important;
-  color: black !important;
+/* Today: green border in every month view, never yellow */
+.react-calendar__tile.today-border {
+    border: 3px solid #28a745 !important;
+    border-radius: 4px;
+}
+.react-calendar__tile.today-border:not(.highlight) {
+    background: transparent !important;
+}
+
+/* Black text only when today is in the current month.
+   As a spill-over (neighboring month) day it keeps the #ccc gray. */
+.react-calendar__tile.today-border:not(.react-calendar__month-view__days__day--neighboringMonth):not(.highlight) {
+    color: black !important;
+}
+
+/* Never show react-calendar's default yellow for today */
+.react-calendar__tile--now,
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+    background: transparent;
 }
 
 /* Remove default active/focus visuals */

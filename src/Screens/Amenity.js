@@ -111,7 +111,7 @@ export const Amenity = () => {
         const isToday = isSameDay(date, new Date());
         const isFuture = date > new Date();
 
-        if (!isSameMonth) return null;
+        if (!isSameMonth) return isToday ? "today-border" : null;
         if (isToday) return "today-border";
         if (isFuture) return "future-date";
 
