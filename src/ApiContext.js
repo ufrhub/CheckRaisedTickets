@@ -6,7 +6,7 @@ export const ApiProvider = ({ children }) => {
     const [token, setToken] = useState({ source: null, value: null });
     const [amenityID, setAmenityID] = useState({ source: null, value: null });
     const [showBackButton, setShowBackButton] = useState({ source: null, value: null });
-    const [amenityData, setAmenityData] = useState([]);
+    const [amenityData, setAmenityData] = useState(null);
     const [filteredAmenitySlot, setFilteredAmenitySlot] = useState([]);
     const [dropdownData, setDropdownData] = useState(null);
     const [tickets, setTickets] = useState([]);

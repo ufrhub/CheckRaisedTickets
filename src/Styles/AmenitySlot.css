@@ -185,3 +185,13 @@
   padding: 16px;
   font-weight: 500;
 }
+
+/* Day-based amenities (time_slot "Day") */
+.slot-card.day-card .status-text {
+  text-transform: none;
+}
+
+.slot-card.day-card .day-remaining {
+  color: #666;
+  font-weight: 400;
+}

@@ -4,6 +4,8 @@ import '../Styles/AmenitySlot.css';
 import { useApiContext } from '../ApiContext';
 import axios from "axios";
 import Loader from '../Components/Loader';
+import { mapAmenitySlotsResponse, UnsupportedSlotTypeError } from '../Models/AmenitySlots/AmenitySlotsMapper';
+import { SLOT_KIND } from '../Models/AmenitySlots/AmenitySlotsEntity';
 
 export const AmenitySlot = () => {
   const { token, amenityID, date } = useParams();
@@ -43,9 +45,12 @@ export const AmenitySlot = () => {
     };
   **/
 
-  // Filter out the passed slots according to the reason `Past Time`
-  const filterUpcomingSlots = (slots) => {
-    return slots.filter((slot) => slot.reason !== "past_time");
+  // Hourly: drop slots already in the past. Daily: show every day as returned.
+  const getVisibleItems = (entity) => {
+    if (entity.kind === SLOT_KIND.HOURLY) {
+      return entity.slots.filter((slot) => !slot.isPast);
+    }
+    return entity.days;
   }
 
   useEffect(() => {
@@ -61,18 +66,20 @@ export const AmenitySlot = () => {
           }
         });
 
-        const result = response.data.data;
-        // const upcomingSlots = filterUpcomingSlots(result.slots, result.date);
-        const upcomingSlots = filterUpcomingSlots(result.slots);
-        setAmenityData(result);
-        setFilteredAmenitySlot(upcomingSlots);
+        const entity = mapAmenitySlotsResponse(response.data);
+        setAmenityData(entity);
+        setFilteredAmenitySlot(getVisibleItems(entity));
       } catch (error) {
-        console.error('Error fetching technicians data:', error);
+        console.error('Error fetching amenity slots:', error);
         // Clear any slots left over from a previous successful load
-        setAmenityData([]);
+        setAmenityData(null);
         setFilteredAmenitySlot([]);
-        // Show the API's own message (e.g. "Your session expired, Please login again")
-        setErrorMessage(error?.response?.data?.message || 'Something went wrong while loading the slots. Please try again.');
+        if (error instanceof UnsupportedSlotTypeError) {
+          setErrorMessage("This amenity's booking type isn't supported yet.");
+        } else {
+          // Show the API's own message (e.g. "Your session expired, Please login again")
+          setErrorMessage(error?.response?.data?.message || 'Something went wrong while loading the slots. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
@@ -100,6 +107,52 @@ export const AmenitySlot = () => {
 
     return `${h}:${minutes} ${ampm}`;
   };
+
+  const isDaily = amenityData?.kind === SLOT_KIND.DAILY;
+
+  const renderHourlySlot = (slot, index) => (
+    <button
+      key={index}
+      className={`slot-card ${slot.available ? 'available' : 'unavailable'}`}
+      disabled={!slot.available}
+    >
+      <div className="slot-time">
+        {formatTime(slot.startTime)}
+      </div>
+      <div className="slot-status">
+        {slot.available ? (
+          <span className="status-text success">Available</span>
+        ) : (
+          <span className="status-text error">
+            {formatReason(slot.reason)}
+          </span>
+        )}
+      </div>
+    </button>
+  );
+
+  const renderDayCard = (day) => (
+    <button
+      key={day.date}
+      className={`slot-card day-card ${day.available ? 'available' : 'unavailable'}`}
+      disabled={!day.available}
+    >
+      <div className="slot-time">
+        {formatDate(day.date)}
+      </div>
+      <div className="slot-status">
+        {day.available ? (
+          <span className="status-text success">
+            Available<span className="day-remaining"> · {day.remaining} remaining</span>
+          </span>
+        ) : (
+          <span className="status-text error">
+            {formatReason(day.reason) || 'Unavailable'}
+          </span>
+        )}
+      </div>
+    </button>
+  );
 
   // Helper to clean up the reason text
   const formatReason = (reason) => {
@@ -132,9 +185,15 @@ export const AmenitySlot = () => {
               </div>
 
               <div className="header-section end">
-                <div className="slot-info-badge">
-                  <span>Max Duration: {amenityData?.max_duration_formatted}</span>
-                </div>
+                {amenityData && (
+                  <div className="slot-info-badge">
+                    {isDaily ? (
+                      <span>Max Stay: {amenityData.maxDays} {amenityData.maxDays === 1 ? 'day' : 'days'}</span>
+                    ) : (
+                      <span>Max Duration: {amenityData.maxDurationLabel}</span>
+                    )}
+                  </div>
+                )}
               </div>
             </header>
 
@@ -148,34 +207,17 @@ export const AmenitySlot = () => {
                   filteredAmenitySlot &&
                   filteredAmenitySlot.length > 0
                   ?
-                  filteredAmenitySlot?.map((slot, index) => (
-                    <button
-                      key={index}
-                      className={`slot-card ${slot.available ? 'available' : 'unavailable'}`}
-                      disabled={!slot.available}
-                    >
-                      <div className="slot-time">
-                        {formatTime(slot.start_time)}
-                      </div>
-                      <div className="slot-status">
-                        {slot.available ? (
-                          <span className="status-text success">Available</span>
-                        ) : (
-                          <span className="status-text error">
-                            {formatReason(slot.reason)}
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  ))
+                  (isDaily
+                    ? filteredAmenitySlot.map(renderDayCard)
+                    : filteredAmenitySlot.map(renderHourlySlot))
                   :
-                  <div>No Slots Available</div>
+                  <div>{isDaily ? 'No Dates Available' : 'No Slots Available'}</div>
               }
             </div>
 
             {!errorMessage && (
               <div style={{ textAlign: "center", margin: "30px 0" }}>
-                All Slots Loaded.
+                {isDaily ? 'All Dates Loaded.' : 'All Slots Loaded.'}
               </div>
             )}
           </div>
